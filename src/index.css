@@ -71,8 +71,12 @@ body{
   .social-container{ grid-template-columns: repeat(2,1fr) }
 }
 
+@media (max-width: 767px){
+  .follow-sep{ margin-top:10px }
+}
+
 /* Separator below Follow Me and footer note */
-.follow-sep{ margin-top:20px; border:0; height:1px; background: rgba(255,255,255,0.06); width:100% }
+.follow-sep{ margin-top:10px; border:0; height:1px; background: rgba(255,255,255,0.06); width:100% }
 .footer-note{ margin-top:30px; text-align:center; color: rgba(255,255,255,0.32); font-size:13px }
 
 /* CTA card used on Services page */
@@ -304,6 +308,43 @@ html { scroll-behavior: smooth }
   .hero-right{ text-align:center }
 }
 
+/* Mobile layout: make sidebar a top bar */
+@media (max-width: 767px){
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    width:100%;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 12px;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+    z-index:40;
+  }
+
+  .sidebar .profile-block{ display:flex; flex-direction:row; align-items:center; gap:12px; margin-top:0 }
+  .sidebar .profile-block > div{ margin-bottom:0 }
+  .profile-circle{ width:56px; height:56px; border-width:2px; }
+  .profile-image{ width:56px; height:56px; border-width:2px }
+  .sidebar .profile-circle{ margin-top:10px }
+
+  .sidebar .profile-block > h2,
+  .sidebar .profile-block > p{ display:none }
+
+  /* show only icons on mobile top bar */
+  .collapse-btn{ display:none }
+  .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:12px; align-items:center; flex-wrap:nowrap }
+  .nav-item{ padding:6px; border-radius:8px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center }
+  .nav-item:hover{ transform:none; background:rgba(255,255,255,0.04) }
+  .nav-item span{ display:none }
+
+  .main-content{ margin-left:0; padding-top:84px }
+}
+
 /* Profile image helper */
 .profile-image{ width:120px; height:120px; border-radius:50%; border:3px solid var(--primary); box-shadow:0 0 20px var(--primary); }
 
@@ -358,6 +399,12 @@ html { scroll-behavior: smooth }
 .icon{ display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:var(--border); margin-right:16px; font-size:20px }
 .icon.gradient{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white }
 .info-card:hover{ transform:translateY(-6px); box-shadow:0 15px 40px rgba(0,0,0,0.6); transition:0.3s }
+
+/* Global icon spacing: give icons a 10px bottom margin for visual separation */
+.nav-item svg,
+.social-icon,
+.service-icon,
+.icon{ margin-bottom:10px }
 
 /* Vertical divider between label and value */
 /* remove extra right padding on label; spacing handled by cell padding */

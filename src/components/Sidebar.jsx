@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaHome, FaUser, FaServicestack, FaEnvelope, FaTimes, FaBars } from 'react-icons/fa'
 
 const items = [
@@ -10,20 +10,31 @@ const items = [
 
 export default function Sidebar({ active, onNavigate }){
   const [collapsed, setCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 767)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   return (
     <aside className={`sidebar bg-sidebar p-6 border-r ${collapsed ? 'collapsed' : ''}`}>
-      <div className="flex justify-end">
-        <button aria-label="Toggle sidebar" className="collapse-btn" onClick={() => setCollapsed(s => !s)}>
-          {collapsed ? <FaBars /> : <FaTimes />}
-        </button>
-      </div>
+      {/* only show collapse toggle on non-mobile */}
+      {!isMobile && (
+        <div className="flex justify-end">
+          <button aria-label="Toggle sidebar" className="collapse-btn" onClick={() => setCollapsed(s => !s)}>
+            {collapsed ? <FaBars /> : <FaTimes />}
+          </button>
+        </div>
+      )}
 
       <div className="flex flex-col items-center text-center profile-block">
         <div className="profile-circle rounded-full">
           <img src="/Atif.png" alt="profile" className="profile-image" />
         </div>
-        {!collapsed && (
+        {!collapsed && !isMobile && (
           <>
             <h2 className="mt-4 text-2xl font-extrabold">Atif Ayyoub</h2>
             <p className="text-sm text-[#22D3EE] mt-1">AI Web & Custom Software Developer</p>
@@ -40,7 +51,7 @@ export default function Sidebar({ active, onNavigate }){
               <li key={it.id} className={`nav-item ${isActive ? 'active' : ''}`} onClick={() => onNavigate(it.id)}>
                 <div className="flex items-center justify-center">
                   <Icon className="text-lg" />
-                  {!collapsed && <span>{'\u00A0\u00A0'}{it.label}</span>}
+                  {!isMobile && !collapsed && <span>{'\u00A0\u00A0'}{it.label}</span>}
                 </div>
               </li>
             )
