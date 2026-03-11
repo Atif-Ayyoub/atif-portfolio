@@ -35,15 +35,18 @@ export default function Contact(){
 
         <div className="follow-card message-card">
           <div className="follow-title">Send a Message</div>
-          <form className="mt-4" onSubmit={(e)=>e.preventDefault()}>
+          <form className="mt-4" action="https://formsubmit.co/atifayyoub582@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New message from portfolio contact form" />
+            <input type="hidden" name="_captcha" value="false" />
+
             <label className="block text-[var(--text-secondary)] mb-2">Full Name *</label>
-            <input placeholder="Full Name" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white mb-4" />
+            <input name="name" required placeholder="Full Name" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white mb-4" />
 
             <label className="block text-[var(--text-secondary)] mb-2">Subject *</label>
-            <input placeholder="Subject" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white mb-4" />
+            <input name="subject" required placeholder="Subject" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white mb-4" />
 
             <label className="block text-[var(--text-secondary)] mb-2">Message *</label>
-            <textarea placeholder="Message" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white h-30 mb-4" />
+            <textarea name="message" required placeholder="Message" className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white h-30 mb-4" />
 
             <div className="text-right">
               <button type="submit" className="btn-contact">Send Message</button>

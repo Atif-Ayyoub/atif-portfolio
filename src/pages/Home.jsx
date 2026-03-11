@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { FaLinkedin, FaTwitter, FaGithub, FaYoutube } from "react-icons/fa";
+import TechStack from '../components/TechStack'
 
 export default function Home(){
   return (
@@ -88,6 +89,13 @@ export default function Home(){
               </a>
             </div>
           </div>
+          <div className="mt-[100px]">
+            <h2 className="font-extrabold services-title gradient-text">Technologies I Work With</h2>
+            <div className="mt-[30px]">
+              <TechStack />
+            </div>
+          </div>
+
           <hr className="follow-sep" />
           <div className="footer-note">© 2026 Atif Ayyoub All Rights Reserved.</div>
         </div>

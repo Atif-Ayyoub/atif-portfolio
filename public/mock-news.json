@@ -1,0 +1,66 @@
+{
+  "status": "ok",
+  "totalResults": 6,
+  "articles": [
+    {
+      "source": { "id": null, "name": "TechCrunch" },
+      "author": "Jane Doe",
+      "title": "Major breakthrough in AI model efficiency",
+      "description": "Researchers release a new technique that halves training compute.",
+      "url": "https://techcrunch.com/article/ai-breakthrough",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=AI+Breakthrough",
+      "publishedAt": "2026-03-08T08:00:00Z",
+      "content": "Full article content..."
+    },
+    {
+      "source": { "id": null, "name": "Wired" },
+      "author": "John Smith",
+      "title": "Startups embrace tiny models for edge devices",
+      "description": "A new class of compact models enables advanced AI on phones.",
+      "url": "https://wired.com/article/edge-models",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=Edge+AI",
+      "publishedAt": "2026-03-07T14:20:00Z",
+      "content": "Full article content..."
+    },
+    {
+      "source": { "id": null, "name": "The Verge" },
+      "author": "Alex Lee",
+      "title": "New browser features speed up web apps",
+      "description": "Performance gains from a new rendering pipeline.",
+      "url": "https://theverge.com/article/browser-performance",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=Browser+Perf",
+      "publishedAt": "2026-03-06T10:05:00Z",
+      "content": "Full article content..."
+    },
+    {
+      "source": { "id": null, "name": "BBC News" },
+      "author": "Reporter",
+      "title": "Global cooperation on climate tech expands",
+      "description": "Nations announce joint funding for carbon removal.",
+      "url": "https://bbc.co.uk/article/climate-tech",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=Climate+Tech",
+      "publishedAt": "2026-03-05T09:30:00Z",
+      "content": "Full article content..."
+    },
+    {
+      "source": { "id": null, "name": "Engadget" },
+      "author": "Gadget Guru",
+      "title": "A new foldable sets a high bar for battery life",
+      "description": "Battery innovations keep folding phones practical.",
+      "url": "https://engadget.com/article/foldable-battery",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=Foldable+Phone",
+      "publishedAt": "2026-03-04T16:45:00Z",
+      "content": "Full article content..."
+    },
+    {
+      "source": { "id": null, "name": "Ars Technica" },
+      "author": "Cy",
+      "title": "Open-source tools simplify ML ops",
+      "description": "New OSS tooling reduces friction for model deployment.",
+      "url": "https://arstechnica.com/article/ml-ops-tools",
+      "urlToImage": "https://via.placeholder.com/640x360.png?text=ML+Ops",
+      "publishedAt": "2026-03-03T12:10:00Z",
+      "content": "Full article content..."
+    }
+  ]
+}

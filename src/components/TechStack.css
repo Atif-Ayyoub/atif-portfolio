@@ -1,0 +1,67 @@
+.tech-container{
+  height:600px;
+  width:100%;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  position:relative;
+  overflow:hidden;
+}
+
+/* tech icons */
+
+.tech-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:56px;
+  height:56px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.02);
+  transition:all .22s;
+}
+
+.tech-icon svg{
+  width:40px;
+  height:40px;
+  color: white;
+  filter: drop-shadow(0 0 10px rgba(59,130,246,0.7));
+}
+
+.tech-icon:hover{ transform:scale(1.08) }
+
+/* center card */
+
+.center-card{
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(15px);
+  padding:20px 30px;
+  border-radius:12px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 0 40px rgba(59,130,246,0.4);
+  color:white;
+}
+
+.center-card h2{
+  margin:0;
+  font-size:22px;
+  font-weight:600;
+}
+
+.center-card p{
+  box-shadow:0 10px 40px rgba(0,0,0,0.6), 0 0 36px rgba(59,130,246,0.22);
+  transition: box-shadow .22s ease, transform .18s ease;
+  font-size:14px;
+  opacity:0.7;
+}
+
+/* hovered details panel bottom-right */
+.tech-details{ position:absolute; right:18px; bottom:18px; z-index:40 }
+.tech-details-card{ background:rgba(0,0,0,0.45); padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); backdrop-filter: blur(6px); width:220px }
+.tech-details-card{ box-shadow:0 10px 30px rgba(0,0,0,0.5), 0 0 18px rgba(59,130,246,0.16); }
+.tech-details-title{ font-weight:700; color:white; font-size:14px }
+.tech-details-desc{ color:rgba(255,255,255,0.75); font-size:13px; margin-top:6px }
+
+/* ensure canvas respects container radius */
+.tech-container canvas{ border-radius:20px; display:block }

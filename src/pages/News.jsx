@@ -13,28 +13,35 @@ export default function News(){
 
   useEffect(() => {
     let mounted = true
-    fetch('/news')
+    const key = import.meta.env.VITE_NEWS_API_KEY
+    // If a NewsAPI key is available use the live API, otherwise fall back to a local mock JSON
+    const url = key
+      ? `https://newsapi.org/v2/top-headlines?country=us&apiKey=${key}`
+      : '/mock-news.json'
+
+    fetch(url)
       .then(r=>r.json())
       .then(json=>{
         if(!mounted) return
-        // try a few shapes
         let list = []
-        if(Array.isArray(json)) list = json
+
+        // NewsAPI returns { articles: [ ... ] }
+        if(json && Array.isArray(json.articles)) list = json.articles
+        // fallback to previous shapes
+        else if(Array.isArray(json)) list = json
         else if(Array.isArray(json.data)) list = json.data
-        else if(Array.isArray(json.articles)) list = json.articles
         else if(json && typeof json === 'object'){
-          // try to extract values
           list = Object.values(json).flat().filter(Boolean)
         }
 
-        // normalize
+        // normalize specifically for NewsAPI fields when present
         const mapped = list.map(it => ({
           title: pick(it,'title','heading','name','post_title') || 'Untitled',
-          date: pick(it,'date','published','created_at','pubDate') || '',
-          source: pick(it,'source','publisher','site','domain') || pick(it,'author','by') || 'Unknown',
+          date: pick(it,'publishedAt','date','published','created_at') || '',
+          source: (it && it.source && it.source.name) || pick(it,'source','publisher','site','domain') || pick(it,'author','by') || 'Unknown',
           readTime: pick(it,'read_time','reading_time','read') || '',
-          category: pick(it,'category','type','tag','tags') || (it.tags && it.tags[0]) || 'All',
-          image: pick(it,'image','thumbnail','thumb','featured_image','media') || '',
+          category: (it && it.category) || (it && it.tags && it.tags[0]) || 'All',
+          image: pick(it,'urlToImage','image','thumbnail','thumb','featured_image','media') || '',
           url: pick(it,'url','link','permalink') || '#'
         }))
 
@@ -64,7 +71,9 @@ export default function News(){
             <div className="news-card-top">
               <div className="news-type">{it.category}</div>
               <div className="news-thumb">
-                {it.image ? <img src={it.image} alt="thumb" /> : <div className="thumb-placeholder" />}
+                {it.image
+                  ? <img src={it.image} alt="thumb" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/thumb-placeholder.svg' }} />
+                  : <img src="/thumb-placeholder.svg" alt="thumb" />}
               </div>
             </div>
 

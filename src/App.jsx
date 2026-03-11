@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import Projects from './pages/Projects'
 import Sidebar from './components/Sidebar'
 import Cursor from './components/Cursor'
 import AnimatedBg from './components/AnimatedBg'
@@ -16,6 +17,7 @@ export default function App(){
       case 'home': return <Home />
       case 'about': return <About />
       case 'services': return <Services />
+      case 'projects': return <Projects />
       case 'news': return <News />
       case 'contact': return <Contact />
       default: return <Home />

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { FaHome, FaUser, FaServicestack, FaEnvelope, FaTimes, FaBars, FaNewspaper } from 'react-icons/fa'
+import { FolderKanban } from 'lucide-react'
 
 const items = [
   { id: 'home', label: 'Home', icon: FaHome },
   { id: 'about', label: 'About', icon: FaUser },
   { id: 'services', label: 'Services', icon: FaServicestack },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'news', label: 'News', icon: FaNewspaper },
   { id: 'contact', label: 'Contact', icon: FaEnvelope },
 ]

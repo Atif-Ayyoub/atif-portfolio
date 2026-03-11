@@ -1,0 +1,45 @@
+:root{ --home-gap:40px }
+
+/* Page-local Home styles (keeps layout scoped to Home) */
+.hero{ min-height:100vh; display:flex; flex-direction:column; justify-content:center; position:relative }
+
+.hero-row{ display:flex; align-items:center; gap:var(--home-gap); justify-content:flex-start; max-width:100%; box-sizing:border-box; flex-wrap:wrap; width:100% }
+.hero-left{ display:flex; align-items:flex-start; justify-content:flex-start; flex-shrink:0; flex:0 0 220px; box-sizing:border-box; max-width:220px }
+.hero-right{ display:flex; flex-direction:column; text-align:left; flex:1 1 0; min-width:0; box-sizing:border-box }
+
+.left-circle{ width:220px; height:220px; max-width:100%; border-radius:50%; background: url('/Atif1.png') center/cover no-repeat, linear-gradient(135deg, rgba(79,70,229,0.12), rgba(34,211,238,0.06)); border:3px solid var(--primary); display:flex; align-items:center; justify-content:center; box-shadow:0 18px 60px rgba(34,211,238,0.03), 0 8px 30px rgba(79,70,229,0.08); animation: floatCircle 3.2s ease-in-out infinite; background-size:cover; box-sizing:border-box }
+
+.details-container{ display:grid; grid-template-columns:1fr; gap:30px; margin-top:40px; align-items:stretch; width:100%; box-sizing:border-box; min-height:120px }
+
+@media (min-width: 768px){
+  .details-container{ grid-template-columns: minmax(0,1fr) minmax(0,1fr); column-gap:30px; justify-items:stretch }
+  .details-container .info-card{ width:100%; max-width:none }
+}
+
+@media (max-width: 767px){
+  .hero-row{ flex-direction:column; text-align:center }
+  .hero-left{ margin-bottom:12px; align-items:center; justify-content:center }
+  .hero-right{ text-align:center }
+  .details-container{ grid-template-columns: 1fr }
+}
+
+.footer-note{ margin-top:30px; text-align:center; color: rgba(255,255,255,0.32); font-size:13px }
+
+.home-buttons{ margin-top:30px; display:flex; gap:20px }
+.btn-resume{ padding:12px 24px; background:transparent; border:1.5px solid var(--primary); color:var(--primary); border-radius:8px; font-size:15px; cursor:pointer; transition:0.3s }
+.btn-resume:hover{ background:var(--primary); color:white }
+.btn-contact{ padding:12px 24px; border:none; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:white; border-radius:8px; font-size:15px; font-weight:500; cursor:pointer; transition:0.3s }
+.btn-contact:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.4) }
+
+/* Follow / Social styles (scoped for Home) */
+.follow-card{ margin-top:30px; background:var(--card); padding:25px; border-radius:14px; border:1px solid var(--border) }
+.follow-title{ color:white; font-size:22px; margin-bottom:20px }
+.social-container{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px }
+.social-card{ background:var(--border); padding:18px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:0.3s; text-decoration:none }
+.social-card:hover{ transform:translateY(-5px); background:#374151; box-shadow:0 10px 25px rgba(0,0,0,0.5) }
+.social-icon{ font-size:26px; margin-bottom:8px; color:var(--secondary) }
+.social-card span{ color:#E5E7EB; font-size:14px }
+
+@media (max-width: 767px){
+  .social-container{ grid-template-columns: repeat(2,1fr) }
+}
