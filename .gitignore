@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+server/.env
+server/node_modules
+scripts/test-news-insert.cjs

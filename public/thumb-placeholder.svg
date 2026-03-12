@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160" viewBox="0 0 240 160" preserveAspectRatio="xMidYMid meet">
-  <rect width="100%" height="100%" fill="#0F1724" />
-  <g fill="#334155">
-    <rect x="12" y="12" width="216" height="136" rx="8" />
-  </g>
-  <text x="50%" y="50%" fill="#94A3B8" font-size="14" font-family="Poppins, Arial, sans-serif" text-anchor="middle" dominant-baseline="middle">No image</text>
-</svg>
