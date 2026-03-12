@@ -3,10 +3,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase keys are not set. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env')
+let supabase = null
+
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey)
+} else {
+  console.warn('Supabase keys are not set. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.')
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
-
+export { supabase }
 export default supabase
