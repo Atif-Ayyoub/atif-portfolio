@@ -320,6 +320,34 @@ html { scroll-behavior: smooth }
   box-shadow:0 0 25px rgba(79,70,229,0.25);
 }
 
+/* Unified hover gradient for all cards and buttons */
+.glass-card:hover,
+.follow-card:hover,
+.social-card:hover,
+.cta-card:hover,
+.message-card:hover,
+.news-card:hover,
+.news-card-item:hover,
+.service-card:hover,
+.project-card:hover,
+.info-card:hover,
+.tech-stack-card:hover,
+.tech-details-card:hover,
+.center-card:hover,
+.btn-resume:hover,
+.btn-contact:hover,
+.project-btn:hover,
+.gradient-btn:hover,
+.read-more:hover,
+.original-btn:hover,
+.collapse-btn:hover,
+.modal-close:hover,
+.news-card li:hover,
+button:hover {
+  background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+  border-color: var(--secondary) !important;
+}
+
 /* Floating decorative circle inside main content */
 .main-circle{
   position:absolute;
@@ -424,7 +452,7 @@ html { scroll-behavior: smooth }
   .collapse-btn{ display:none }
   .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:12px; align-items:center; flex-wrap:nowrap }
   .nav-item{ padding:6px; border-radius:8px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center }
-  .nav-item:hover{ transform:none; background:rgba(255,255,255,0.04) }
+  .nav-item:hover{ transform:none; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff }
   .nav-item span{ display:none }
 
   .main-content{ margin-left:0; padding-top:84px }
@@ -565,7 +593,7 @@ html { scroll-behavior: smooth }
 /* Sidebar nav styling */
 .nav-menu{ margin-left:10px; margin-top:20px; display:flex; flex-direction:column; gap:10px; list-style:none; padding:0 }
 .nav-item{ padding:12px 15px; border-radius:8px; cursor:pointer; color:#cbd5e1; background:var(--border); transition:0.3s; font-size:15px }
-.nav-item:hover{ background:#374151; transform:translateX(5px) }
+.nav-item:hover{ background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; transform:translateX(5px) }
 .nav-item.active{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; font-weight:600 }
 
 .sidebar{ padding:20px }
