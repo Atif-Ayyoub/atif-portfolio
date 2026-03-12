@@ -29,6 +29,7 @@ export default function News(){
   useEffect(() => {
     let mounted = true
     const devUrl = 'https://dev.to/api/articles?per_page=10&tag=technology'
+    const serverNewsUrl = '/api/news'
 
     const mapDev = (list) => {
       if(!Array.isArray(list)) list = []
@@ -62,12 +63,96 @@ export default function News(){
       }))
     }
 
-    // Fetch both sources in parallel (if NewsAPI key exists), otherwise just DEV.to
-    const fetches = [fetch(devUrl).then(r=>{ if(!r.ok) throw new Error('DEV.to failed'); return r.json() }).then(mapDev)]
-    if(newsApiUrl) fetches.push(fetch(newsApiUrl).then(r=>{ if(!r.ok) throw new Error('NewsAPI failed'); return r.json() }).then(json => mapNewsApi(json.articles || [])))
+    const persistItems = async (finalList) => {
+      try{
+        if(supabase && typeof supabase.from === 'function' && finalList.length){
+          const uploadServer = import.meta.env.VITE_UPLOAD_SERVER_URL || 'http://localhost:5000/api/upload-image'
 
-    Promise.allSettled(fetches)
+          const rows = []
+          for(const a of finalList){
+            let imageUrl = a.image || ''
+            try{
+              if(imageUrl && !imageUrl.includes(`/storage/v1/object/public/news-images/`)){
+                const payload = { imageUrl, name: (a.title || 'news').replace(/[^a-z0-9]/gi,'').toLowerCase().slice(0,50) }
+                const resp = await fetch(uploadServer, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+                })
+                if(resp.ok){
+                  const j = await resp.json()
+                  if(j && j.url) imageUrl = j.url
+                } else {
+                  console.warn('Upload server responded', resp.status)
+                }
+              }
+            }catch(e){
+              console.warn('Image upload failed for', a.url, e)
+            }
+
+            rows.push({
+              title: a.title,
+              description: a.description,
+              url: a.url,
+              image: imageUrl,
+              published_at: a.date ? new Date(a.date).toISOString() : null,
+              source: a.source,
+              category: a.category
+            })
+          }
+
+          await supabase.from('news').upsert(rows, { onConflict: 'url' })
+
+          const cutoff = new Date()
+          cutoff.setDate(cutoff.getDate() - 7)
+          await supabase.from('news').delete().lt('published_at', cutoff.toISOString())
+        }
+      }catch(err){
+        console.warn('Supabase persistence failed', err)
+      }
+    }
+
+    const applyResults = (successLists) => {
+      if(!mounted) return
+      const merged = []
+      const seen = new Set()
+      for(const list of successLists){
+        for(const it of list){
+          const key = it.url || it.title
+          if(seen.has(key)) continue
+          seen.add(key)
+          merged.push(it)
+        }
+      }
+
+      const finalList = merged.filter(it => it.image && String(it.image).trim() !== '')
+      setItems(finalList)
+      void persistItems(finalList)
+    }
+
+    fetch(serverNewsUrl)
+      .then(r => {
+        if(!r.ok) throw new Error('Server news endpoint failed')
+        return r.json()
+      })
+      .then(json => {
+        const items = Array.isArray(json?.items) ? json.items : []
+        if(items.length) {
+          applyResults([items])
+          return null
+        }
+
+        throw new Error('Server news endpoint returned no items')
+      })
+      .catch(() => {
+        // Fetch both sources in parallel (if NewsAPI key exists), otherwise just DEV.to
+        const fetches = [fetch(devUrl).then(r=>{ if(!r.ok) throw new Error('DEV.to failed'); return r.json() }).then(mapDev)]
+        if(newsApiUrl) fetches.push(fetch(newsApiUrl).then(r=>{ if(!r.ok) throw new Error('NewsAPI failed'); return r.json() }).then(json => mapNewsApi(json.articles || [])))
+
+        return Promise.allSettled(fetches)
+      })
       .then(results => {
+        if(results === null) return
         if(!mounted) return
         const successLists = []
         for(const res of results){
@@ -98,75 +183,7 @@ export default function News(){
             .catch(e => { console.error('mock-news.json fetch also failed', e); setItems([]) })
         }
 
-        // merge, prefer NewsAPI image if available
-        const merged = []
-        const seen = new Set()
-        for(const list of successLists){
-          for(const it of list){
-            const key = it.url || it.title
-            if(seen.has(key)) continue
-            seen.add(key)
-            merged.push(it)
-          }
-        }
-
-        // filter to items with images and set
-        const finalList = merged.filter(it => it.image && String(it.image).trim() !== '')
-        setItems(finalList)
-
-        // persist to Supabase (best-effort) and cleanup old records
-        ;(async function persist(){
-          try{
-            if(supabase && typeof supabase.from === 'function' && finalList.length){
-              // upload images to storage via server endpoint before upserting
-              const uploadServer = import.meta.env.VITE_UPLOAD_SERVER_URL || 'http://localhost:5000/api/upload-image'
-
-              const rows = []
-              for(const a of finalList){
-                let imageUrl = a.image || ''
-                try{
-                  // skip if already in our storage bucket
-                  if(imageUrl && !imageUrl.includes(`/storage/v1/object/public/news-images/`)){
-                    const payload = { imageUrl, name: (a.title || 'news').replace(/[^a-z0-9]/gi,'').toLowerCase().slice(0,50) }
-                    const resp = await fetch(uploadServer, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(payload)
-                    })
-                    if(resp.ok){
-                      const j = await resp.json()
-                      if(j && j.url) imageUrl = j.url
-                    } else {
-                      console.warn('Upload server responded', resp.status)
-                    }
-                  }
-                }catch(e){
-                  console.warn('Image upload failed for', a.url, e)
-                }
-
-                rows.push({
-                  title: a.title,
-                  description: a.description,
-                  url: a.url,
-                  image: imageUrl,
-                  published_at: a.date ? new Date(a.date).toISOString() : null,
-                  source: a.source,
-                  category: a.category
-                })
-              }
-
-              // upsert by `url` to avoid duplicates
-              await supabase.from('news').upsert(rows, { onConflict: 'url' })
-
-              // delete news older than 7 days by published_at
-              const cutoff = new Date()
-              cutoff.setDate(cutoff.getDate() - 7)
-              await supabase.from('news').delete().lt('published_at', cutoff.toISOString())
-            }
-          }catch(err){
-            console.warn('Supabase persistence failed', err)
-          }
-        })()
+        applyResults(successLists)
       })
       .finally(()=>{ if(mounted) setLoading(false) })
 
