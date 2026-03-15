@@ -2,6 +2,7 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import ScrollToTop from './components/ScrollToTop'
 import './index.css'
 import { AdminAuthProvider } from './context/AdminAuthContext'
 import { PortfolioDataProvider } from './context/PortfolioDataContext'
@@ -9,6 +10,7 @@ import { PortfolioDataProvider } from './context/PortfolioDataContext'
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
+        <ScrollToTop />
       <AdminAuthProvider>
         <PortfolioDataProvider>
           <App />
