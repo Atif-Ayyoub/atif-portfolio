@@ -1,29 +1,86 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { FaLinkedin, FaTwitter, FaGithub, FaYoutube } from "react-icons/fa";
 import TechStack from '../components/TechStack'
+import { usePortfolioData } from '../context/PortfolioDataContext'
+import { getSocialIcon } from '../admin/iconMaps'
+import { useNavigate } from 'react-router-dom'
 
 export default function Home(){
-  return (
-    <motion.section initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="hero p-12" style={{position:'relative'}}>
-      <div className="background-circle" />
+  const navigate = useNavigate()
+  const { settings, sortedSocialLinks, sortedServices, sortedProjects } = usePortfolioData()
+  const publicSocialLinks = sortedSocialLinks.filter((link) => link.isActive)
+  const servicesPreview = useMemo(() => sortedServices.filter((service) => service.isActive).slice(0, 3), [sortedServices])
+  const featuredProjects = useMemo(() => sortedProjects.filter((project) => project.isActive).slice(0, 3), [sortedProjects])
 
-      <div className="hero-row max-w-5xl mx-auto w-full flex flex-col md:flex-row items-center gap-8">
-        <div className="hero-left flex-shrink-0 flex items-center justify-center">
-          <div className="left-circle" />
+  const testimonials = useMemo(() => [
+    {
+      id: 't-1',
+      name: 'Client Feedback',
+      role: 'Startup Founder',
+      text: 'Atif delivered a clean and high-performing product with strong communication throughout the project.',
+    },
+    {
+      id: 't-2',
+      name: 'Client Feedback',
+      role: 'Product Manager',
+      text: 'The UI quality and responsiveness exceeded expectations, and the final delivery was polished and reliable.',
+    },
+    {
+      id: 't-3',
+      name: 'Client Feedback',
+      role: 'Business Owner',
+      text: 'Great technical depth and modern design sense. The workflow was smooth from planning to handover.',
+    },
+  ], [])
+
+  useEffect(() => {
+    const elements = document.querySelectorAll('.reveal-on-scroll')
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.18 },
+    )
+
+    elements.forEach((element) => observer.observe(element))
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <motion.section initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="home-premium">
+      <div className="home-bg-orb home-bg-orb-a" />
+      <div className="home-bg-orb home-bg-orb-b" />
+
+      <div className="home-premium-container">
+        <div className="home-hero-grid reveal-on-scroll">
+          <div className="home-hero-content">
+            <p className="home-kicker">{settings.introLine || "Hi, I'm"}</p>
+            <h1 className="home-hero-title">{settings.fullName}</h1>
+            <p className="home-hero-role">{settings.heroTitle}</p>
+            <p className="home-hero-description">{settings.heroSubtitle || 'Building elegant products with modern design, strong engineering, and performance-first delivery.'}</p>
+
+            <div className="home-hero-actions">
+              <a className="home-btn-primary" href={settings.resumeLink || '#'} target={settings.resumeLink ? '_blank' : undefined} rel="noreferrer">Download Resume</a>
+              <button className="home-btn-secondary" onClick={() => navigate('/contact')}>Contact Me</button>
+            </div>
+          </div>
+
+          <div className="home-hero-image-wrap">
+            <div className="home-profile-image" style={{ backgroundImage: `url(${settings.heroImage || '/Atif1.png'})` }} />
+          </div>
         </div>
 
-        <div className="hero-right flex-1">
-          <h1 className="text-5xl font-extrabold leading-tight">Hi, I'm <span className="gradient-text">Atif Ayyoub</span></h1>
-          <p className="mt-4 text-xl text-[var(--text-secondary)]">AI Web & Custom Software Developer</p>
-
-          
-
+        <section className="home-section reveal-on-scroll">
           <div className="details-container">
             <div className="info-card">
               <div className="row">
                 <div className="label"><span className="icon">👤</span> Full Name:</div>
-                <div className="value">Atif Ayyoub</div>
+                <div className="value">{settings.fullName}</div>
               </div>
               <div className="row">
                 <div className="label"><span className="icon">📅</span> Date of Birth:</div>
@@ -31,74 +88,104 @@ export default function Home(){
               </div>
               <div className="row">
                 <div className="label"><span className="icon">📞</span> Phone:</div>
-                <div className="value">+923270728950</div>
+                <div className="value">{settings.phone}</div>
               </div>
               <div className="row">
                 <div className="label"><span className="icon">📍</span> Address:</div>
-                <div className="value">Pakistan</div>
+                <div className="value">{settings.address}</div>
               </div>
             </div>
 
             <div className="info-card">
               <div className="row">
                 <div className="label"><span className="icon">✉️</span> Email Address:</div>
-                <div className="value">atifayyoub82@gmail.com</div>
+                <div className="value">{settings.email}</div>
               </div>
               <div className="row">
                 <div className="label"><span className="icon">💼</span> Professional Title:</div>
-                <div className="value">AI Web & Custom Software Developer</div>
+                <div className="value">{settings.professionalTitle}</div>
               </div>
               <div className="row">
                 <div className="label"><span className="icon">🌐</span> Languages:</div>
-                <div className="value">English, Urdu, Punjabi</div>
+                <div className="value">{settings.languages}</div>
               </div>
               <div className="row">
                 <div className="label"><span className="icon">🏳️</span> Nationality:</div>
-                <div className="value">Pakistan</div>
+                <div className="value">{settings.nationality}</div>
               </div>
             </div>
-
           </div>
+        </section>
 
-          <div className="home-buttons">
-            <button className="btn-resume">Download Resume ⬇</button>
-            <button className="btn-contact">Contact Me ✉</button>
+        <section className="home-section reveal-on-scroll">
+          <div className="home-section-head">
+            <h2 className="home-section-title">Services I Offer</h2>
+            <button className="home-inline-link" onClick={() => navigate('/services')}>View All</button>
           </div>
+          <div className="home-preview-grid">
+            {servicesPreview.map((service) => (
+              <article key={service.id} className="home-preview-card">
+                <h3>{service.title}</h3>
+                <p>{service.shortDescription}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
+        <section className="home-section reveal-on-scroll">
+          <div className="home-section-head">
+            <h2 className="home-section-title">Featured Projects</h2>
+            <button className="home-inline-link" onClick={() => navigate('/projects')}>View All</button>
+          </div>
+          <div className="home-preview-grid">
+            {featuredProjects.map((project) => (
+              <article key={project.id} className="home-preview-card">
+                <h3>{project.title}</h3>
+                <p>{project.shortDescription}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-section reveal-on-scroll">
+          <h2 className="home-section-title">Technologies I Work With</h2>
+          <div className="home-tech-wrap">
+            <TechStack />
+          </div>
+        </section>
+
+        <section className="home-section reveal-on-scroll">
+          <h2 className="home-section-title">What Clients Say</h2>
+          <div className="home-testimonial-grid">
+            {testimonials.map((item) => (
+              <article key={item.id} className="home-testimonial-card">
+                <p className="home-testimonial-text">“{item.text}”</p>
+                <p className="home-testimonial-name">{item.name}</p>
+                <p className="home-testimonial-role">{item.role}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-section reveal-on-scroll">
           <div className="follow-card">
             <h2 className="follow-title">Follow Me</h2>
             <div className="social-container">
-              <a className="social-card" href="https://www.linkedin.com" target="_blank" rel="noreferrer">
-                <FaLinkedin className="social-icon" />
-                <span>LinkedIn</span>
-              </a>
-
-              <a className="social-card" href="https://twitter.com" target="_blank" rel="noreferrer">
-                <FaTwitter className="social-icon" />
-                <span>Twitter</span>
-              </a>
-
-              <a className="social-card" href="https://github.com" target="_blank" rel="noreferrer">
-                <FaGithub className="social-icon" />
-                <span>GitHub</span>
-              </a>
-
-              <a className="social-card" href="https://www.youtube.com" target="_blank" rel="noreferrer">
-                <FaYoutube className="social-icon" />
-                <span>YouTube</span>
-              </a>
+              {publicSocialLinks.map((link) => {
+                const Icon = getSocialIcon(link.icon)
+                return (
+                  <a key={link.id} className="social-card" href={link.url} target="_blank" rel="noreferrer">
+                    <Icon className="social-icon" />
+                    <span>{link.platform}</span>
+                  </a>
+                )
+              })}
             </div>
           </div>
-          <div className="mt-[100px]">
-            <h2 className="font-extrabold services-title gradient-text">Technologies I Work With</h2>
-            <div className="mt-[30px]">
-              <TechStack />
-            </div>
-          </div>
+        </section>
 
-          <hr className="follow-sep" />
-          <div className="footer-note">© 2026 Atif Ayyoub All Rights Reserved.</div>
-        </div>
+        <hr className="follow-sep" />
+        <div className="footer-note">© 2026 Atif Ayyoub All Rights Reserved.</div>
       </div>
     </motion.section>
   )

@@ -1,18 +1,28 @@
 import React from 'react'
 
-export default function ServiceCard({icon:Icon,title,price,children}){
+export default function ServiceCard({ icon: Icon, title, price, tags = [], onHire, children }) {
   return (
-    <div className="info-card service-card" style={{transition:'transform .3s, box-shadow .3s', paddingTop:20}}>
-      <div style={{display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center'}}>
+    <div className="info-card service-card">
+      <div className="service-card-inner">
         <div className="service-icon-circle">
-          {Icon && <Icon className="service-icon" />}
+          {Icon && <Icon className="service-icon icon" />}
         </div>
 
-        <h3 className="service-title" style={{marginTop:10, marginBottom:10}}>{title}</h3>
+        <h3 className="service-title">{title}</h3>
 
-        <p className="service-desc" style={{marginBottom:10}}>{children}</p>
+        <p className="service-desc">{children}</p>
 
-        <div className="service-price" style={{marginTop:10}}>{price}</div>
+        <div className="service-price">{price}</div>
+
+        <div className="service-tags">
+          {tags.map((tag) => (
+            <span key={`${title}-${tag}`} className="service-tag">{tag}</span>
+          ))}
+        </div>
+
+        <button type="button" className="service-hire-btn" onClick={onHire}>
+          Hire Me
+        </button>
       </div>
     </div>
   )

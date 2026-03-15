@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaCalendarAlt, FaClock, FaGlobe } from 'react-icons/fa'
 import { supabase } from '../lib/supabaseClient'
@@ -12,6 +12,24 @@ export default function News(){
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [selectedArticle, setSelectedArticle] = useState(null)
+  const [activeFilter, setActiveFilter] = useState('All')
+  const placeholderImage = '/thumb-placeholder.svg'
+  const topicFilters = ['All', 'AI', 'Privacy', 'Science', 'Dev', 'Web Dev', 'Mobile', 'Productivity']
+
+  const detectTopic = (article) => {
+    const text = [article?.title, article?.description, article?.category].filter(Boolean).join(' ').toLowerCase()
+
+    if (/\b(ai|artificial intelligence|llm|machine learning|neural|openai|chatgpt|model)\b/.test(text)) return 'AI'
+    if (/\b(privacy|tracking|data protection|gdpr|surveillance|cookie|cybersecurity|breach)\b/.test(text)) return 'Privacy'
+    if (/\b(science|research|scientist|nasa|space|quantum|biotech|physics)\b/.test(text)) return 'Science'
+    if (/\b(web dev|frontend|back-end|backend|react|vue|angular|css|html|browser|javascript|typescript|next\.js|webapp)\b/.test(text)) return 'Web Dev'
+    if (/\b(mobile|android|ios|iphone|smartphone|tablet|play store|app store|flutter|kotlin|swift)\b/.test(text)) return 'Mobile'
+    if (/\b(productivity|workflow|automation|notion|calendar|todo|task|efficiency)\b/.test(text)) return 'Productivity'
+    if (/\b(dev|developer|development|programming|coding|software|devops|cloud|api|open-source|open source|node|python|php|laravel)\b/.test(text)) return 'Dev'
+    return 'Dev'
+  }
+
+  const withTopic = (list) => list.map((item) => ({ ...item, topic: detectTopic(item) }))
 
   function formatDateTime(raw){
     if(!raw) return ''
@@ -125,7 +143,7 @@ export default function News(){
         }
       }
 
-      const finalList = merged
+      const finalList = withTopic(merged)
       setItems(finalList)
       if(shouldPersist) void persistItems(finalList)
     }
@@ -178,7 +196,7 @@ export default function News(){
                 description: pick(it,'description') || '',
                 url: pick(it,'url','link','permalink') || '#'
               }))
-              setItems(mapped)
+              setItems(withTopic(mapped))
             })
             .catch(e => { console.error('mock-news.json fetch also failed', e); setItems([]) })
         }
@@ -197,6 +215,11 @@ export default function News(){
     return ()=> document.removeEventListener('keydown', onKey)
   },[selectedArticle])
 
+  const filteredItems = useMemo(() => {
+    if (activeFilter === 'All') return items
+    return items.filter((item) => item.topic === activeFilter)
+  }, [activeFilter, items])
+
   return (
     <motion.section initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="p-12">
       <div className="contact-hero">
@@ -204,18 +227,42 @@ export default function News(){
         <p className="text-[var(--text-secondary)] mt-5">Stay updated with technology news</p>
       </div>
 
-      <div className="news-grid mt-8">
-        {loading && <div className="text-[var(--text-secondary)]">Loading...</div>}
-        {!loading && items.length === 0 && <div className="text-[var(--text-secondary)]">No news available.</div>}
+      <div className="news-filters" role="tablist" aria-label="News topic filters">
+        {topicFilters.map((filter) => (
+          <button
+            key={filter}
+            type="button"
+            onClick={() => setActiveFilter(filter)}
+            className={`news-filter-btn ${activeFilter === filter ? 'is-active' : ''}`}
+            aria-pressed={activeFilter === filter}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
 
-        {items.map((it, idx) => (
+      <div className="news-grid mt-8">
+        {loading && Array.from({ length: 6 }).map((_, index) => (
+          <article key={`skeleton-${index}`} className="news-card-item news-skeleton-card" aria-hidden="true">
+            <div className="news-image skeleton" />
+            <div className="news-card-bottom">
+              <div className="skeleton skeleton-text skeleton-text-sm" />
+              <div className="skeleton skeleton-text" />
+              <div className="skeleton skeleton-text skeleton-text-md" />
+              <div className="skeleton skeleton-btn" />
+            </div>
+          </article>
+        ))}
+        {!loading && filteredItems.length === 0 && <div className="text-[var(--text-secondary)]">No news available for this topic.</div>}
+
+        {filteredItems.map((it, idx) => (
           <article key={idx} className="news-card-item">
             <div className="news-card-top">
-              <div className="news-type">{it.category}</div>
-              <div className="news-thumb">
+              <div className="news-type news-tag">{it.topic || 'Dev'}</div>
+              <div className="news-thumb news-image">
                 {it.image
-                  ? <img src={it.image} alt="thumb" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/thumb-placeholder.svg' }} />
-                  : <img src="/thumb-placeholder.svg" alt="thumb" />}
+                  ? <img src={it.image} alt="thumb" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage }} />
+                  : <img src={placeholderImage} alt="thumb" />}
               </div>
             </div>
 
@@ -226,9 +273,12 @@ export default function News(){
                 <div className="meta-item"><FaClock className="meta-icon" /> {it.readTime ? `${it.readTime} read` : ''}</div>
               </div>
 
-              <h2 className="news-title">{it.title}</h2>
+              <div className="news-content">
+                <h2 className="news-title">{it.title}</h2>
+                <p className="news-description">{it.description || 'Read the latest technology update from this source.'}</p>
+              </div>
 
-              <button className="read-more" onClick={() => setSelectedArticle(it)}>READ MORE</button>
+              <button className="read-more read-btn" onClick={() => setSelectedArticle(it)}>READ MORE</button>
             </div>
           </article>
         ))}

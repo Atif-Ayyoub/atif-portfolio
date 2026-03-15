@@ -1,65 +1,127 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import StatsCard from '../components/StatsCard'
-import ProgressBar from '../components/ProgressBar'
+import { usePortfolioData } from '../context/PortfolioDataContext'
+import { FaBookOpen, FaBrain, FaCode, FaMobileAlt, FaNodeJs, FaPalette, FaPlane, FaPython, FaReact } from 'react-icons/fa'
+
+const statItems = [
+  { value: '1+', label: 'Years Experience' },
+  { value: '5+', label: 'Completed Projects' },
+  { value: '100%', label: 'Client Focused Delivery' },
+]
+
+const skillCategories = [
+  {
+    title: 'Development',
+    items: [
+      { name: 'React', progress: 84, icon: FaReact },
+      { name: 'Node.js', progress: 78, icon: FaNodeJs },
+      { name: 'Laravel', progress: 75, icon: FaCode },
+    ],
+  },
+  {
+    title: 'AI / ML',
+    items: [
+      { name: 'Python', progress: 80, icon: FaPython },
+      { name: 'Prompt Engineering', progress: 86, icon: FaBrain },
+      { name: 'OpenAI Workflows', progress: 82, icon: FaCode },
+    ],
+  },
+  {
+    title: 'Mobile / Design',
+    items: [
+      { name: 'Flutter', progress: 77, icon: FaMobileAlt },
+      { name: 'UI Systems', progress: 81, icon: FaPalette },
+      { name: 'Product UX', progress: 76, icon: FaReact },
+    ],
+  },
+]
+
+const interestItems = [
+  { label: 'Reading', icon: FaBookOpen },
+  { label: 'Technology', icon: FaBrain },
+  { label: 'Design', icon: FaPalette },
+  { label: 'Travel', icon: FaPlane },
+]
 
 export default function About(){
+  const { settings } = usePortfolioData()
+
   return (
-    <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="p-12">
-      <h2 className="text-4xl font-extrabold text-center about-title">About Me</h2>
-      <p className="text-[var(--text-secondary)] mt-3 text-center">Get to know me better</p>
+    <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="about-page">
+      <div className="about-bg-glow about-bg-glow-a" aria-hidden="true" />
+      <div className="about-bg-glow about-bg-glow-b" aria-hidden="true" />
 
-      <div className="about-grid max-w-5xl mx-auto mt-6">
-        <div className="about-left">
-          <h2 className="about-hello">Hello, I'm Atif Ayyoub</h2>
-          <p className="about-subtext">Consistency Makes a Man Perfect in Their Skill Set.</p>
-          <p className="about-bio">I’m a passionate and results driven professional who believes in delivering quality work that truly makes an impact. With a strong background in technology, design, and digital innovation, I specialize in creating practical, high performing solutions tailored to each client’s unique goals. I take pride in clear communication, creative problem solving, and a commitment to exceeding expectations on every project. My focus is always on building long-term partnerships through reliability, professionalism, and exceptional results.</p>
-        </div>
+      <section className="about-hero-wrap">
+        <h2 className="about-title-main">{settings.aboutHeading || 'About Me'}</h2>
+        <p className="about-subtitle-main">{settings.aboutDescription || 'Get to know me better'}</p>
 
-        <div className="about-right flex items-start justify-center">
-          <div className="about-right-circle" />
-        </div>
-      </div>
-
-      <h2 className="about-stats">Statistics</h2>
-
-      <div className="quick-stats">
-        <div className="quick-item"><span className="quick-value">1+</span> <span className="quick-label">Years Experience</span></div>
-        <div className="quick-item"><span className="quick-value">5+</span> <span className="quick-label">Completed Projects</span></div>
-      </div>
-
-      <h2 className="about-skills">Skills & Expertise</h2>
-
-      <div className="mt-8 max-w-3xl mx-auto text-left">
-          <h3 className="text-2xl font-bold">Skills</h3>
-          <div className="mt-4 skills-section">
-          <div className="skill">
-            <div className="skill-title">AI UI Design — Web & APP</div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{"--w":"70%"}}>70%</div>
-            </div>
+        <div className="about-hero-grid">
+          <div className="about-copy">
+            <h3 className="about-hello-modern">Hello, I'm {settings.fullName}</h3>
+            <p className="about-tagline-modern">{settings.professionalTagline}</p>
+            <p className="about-bio-modern">{settings.aboutContent}</p>
           </div>
 
-          <div className="skill">
-            <div className="skill-title">AI Web Development</div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{"--w":"72%"}}>72%</div>
-            </div>
-          </div>
-
-          <div className="skill">
-            <div className="skill-title">AI Mobile App Development</div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{"--w":"77%"}}>77%</div>
-            </div>
+          <div className="about-image-wrap">
+            <div className="about-image-ring" style={{ backgroundImage: `url(${settings.heroImage || '/Atif1.png'})` }} />
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="about-interests-section" style={{marginTop: '50px'}}>
-        <h2 className="about-interests">Personal Interests</h2>
-        <p className="about-interests-text">When I'm not designing, I enjoy exploring new technologies, reading about design trends, and spending time with my family. I believe in maintaining a healthy work-life balance and continuously improving my skills.</p>
-      </div>
+      <motion.section className="about-section-divider" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }}>
+        <h3 className="about-section-title">Statistics</h3>
+        <div className="about-stats-grid">
+          {statItems.map((item) => (
+            <article key={item.label} className="about-stat-card">
+              <p className="about-stat-value">{item.value}</p>
+              <p className="about-stat-label">{item.label}</p>
+            </article>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.section className="about-section-divider" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }}>
+        <h3 className="about-section-title">Skills & Expertise</h3>
+        <div className="about-skills-categories">
+          {skillCategories.map((category) => (
+            <article key={category.title} className="about-skill-category-card">
+              <h4 className="about-skill-category-title">{category.title}</h4>
+              <div className="about-skill-list">
+                {category.items.map((skill) => {
+                  const Icon = skill.icon
+                  return (
+                    <div key={skill.name} className="about-skill-item">
+                      <div className="about-skill-head">
+                        <span className="about-skill-name"><Icon /> {skill.name}</span>
+                        <span className="about-skill-progress-text">{skill.progress}%</span>
+                      </div>
+                      <div className="about-skill-track">
+                        <div className="about-skill-fill" style={{ '--w': `${skill.progress}%` }} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </article>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.section className="about-section-divider" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.55 }}>
+        <h3 className="about-section-title">Personal Interests</h3>
+        <div className="about-interests-grid">
+          {interestItems.map((interest) => {
+            const Icon = interest.icon
+            return (
+              <article key={interest.label} className="about-interest-card">
+                <Icon className="about-interest-icon" />
+                <p className="about-interest-label">{interest.label}</p>
+              </article>
+            )
+          })}
+        </div>
+        <p className="about-interests-note">When I'm not building products, I enjoy exploring new technologies, reading design trends, and continuously improving my craft.</p>
+      </motion.section>
     </motion.div>
   )
 }
