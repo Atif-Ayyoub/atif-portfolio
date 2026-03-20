@@ -44,6 +44,7 @@ export default function AdminProjectsPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [editing, setEditing] = useState(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [tagInput, setTagInput] = useState('')
   const [thumbnailFile, setThumbnailFile] = useState(null)
@@ -75,6 +76,7 @@ export default function AdminProjectsPage() {
 
   const onEdit = (project) => {
     setEditing(project)
+    setIsFormOpen(true)
     setForm({
       ...project,
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
@@ -120,6 +122,20 @@ export default function AdminProjectsPage() {
     setError('')
   }
 
+  const onOpenCreate = () => {
+    setEditing(null)
+    setForm(emptyForm)
+    setThumbnailFile(null)
+    setError('')
+    setSuccess('')
+    setIsFormOpen(true)
+  }
+
+  const onCloseForm = () => {
+    setIsFormOpen(false)
+    setError('')
+  }
+
   const onSubmit = (event) => {
     event.preventDefault()
     setError('')
@@ -144,6 +160,7 @@ export default function AdminProjectsPage() {
     )
     setSuccess(editing ? 'Project updated successfully.' : 'Project created successfully.')
     onReset()
+    setIsFormOpen(false)
   }
 
   const onConfirmDelete = () => {
@@ -155,9 +172,17 @@ export default function AdminProjectsPage() {
 
   return (
     <AdminLayout title="Projects" subtitle="Full CRUD, filters, featured flags, and ordering for portfolio projects.">
-      <div className="admin-crud-grid">
-        <section className="admin-crud-panel">
-          <div className="admin-crud-toolbar admin-crud-toolbar-projects">
+      <div className="admin-projects-page">
+        <section className="admin-crud-panel admin-projects-main-panel">
+          <div className="admin-projects-headbar">
+            <div>
+              <h3 className="admin-form-title" style={{ marginBottom: '4px' }}>My Projects</h3>
+              <p className="admin-form-subtitle" style={{ marginBottom: 0 }}>Manage projects, status, featured flag, ordering, and categories.</p>
+            </div>
+            <button className="admin-form-btn admin-form-btn-primary" type="button" onClick={onOpenCreate}>Add Project</button>
+          </div>
+
+          <div className="admin-crud-toolbar admin-crud-toolbar-projects admin-projects-toolbar">
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -176,37 +201,78 @@ export default function AdminProjectsPage() {
             </select>
           </div>
 
+          {success ? <p className="admin-form-success" style={{ marginBottom: '14px' }}>{success}</p> : null}
+
           <div className="admin-crud-list admin-crud-list-projects">
             {filteredProjects.length === 0 ? <p className="admin-crud-empty">No projects found.</p> : null}
             {filteredProjects.map((project) => (
-              <div key={project.id} className="admin-entity-card">
-                <div className="admin-entity-card-head">
-                  <div>
+              <div key={project.id} className="admin-entity-card admin-project-card">
+                <div className="admin-project-card-layout">
+                  <div className="admin-project-thumb-wrap">
+                    {project.thumbnail ? <img src={project.thumbnail} alt={project.title} className="admin-project-thumb" /> : <div className="admin-project-thumb admin-project-thumb-placeholder" />}
+                  </div>
+
+                  <div className="admin-project-content">
                     <p className="admin-entity-title">{project.title}</p>
                     <p className="admin-entity-meta">{project.category || 'General'} · Order {project.displayOrder}</p>
+                    <p className="admin-entity-description admin-project-description">{project.shortDescription}</p>
                   </div>
-                  <div className="admin-entity-badges">
-                    <StatusBadge active={project.isActive} />
-                    {project.featured ? <span className="admin-featured-badge">Featured</span> : null}
+
+                  <div className="admin-project-right">
+                    <div className="admin-entity-badges admin-project-badges">
+                      <StatusBadge active={project.isActive} />
+                      {project.featured ? <span className="admin-featured-badge">Featured</span> : null}
+                    </div>
+
+                    <div className="admin-project-controls">
+                      <button className="admin-entity-btn admin-entity-btn-edit admin-project-edit-btn" onClick={() => onEdit(project)}>Edit</button>
+
+                      <details className="admin-project-menu">
+                        <summary className="admin-project-menu-trigger" aria-label="More actions">⋯</summary>
+                        <div className="admin-project-menu-content">
+                          <button
+                            className="admin-project-menu-item"
+                            onClick={() => {
+                              upsertProject({ ...project, isActive: !project.isActive }, project.id)
+                              setSuccess('Project status updated.')
+                            }}
+                          >
+                            {project.isActive ? 'Set Inactive' : 'Set Active'}
+                          </button>
+                          <button
+                            className="admin-project-menu-item"
+                            onClick={() => {
+                              upsertProject({ ...project, featured: !project.featured }, project.id)
+                              setSuccess('Project featured flag updated.')
+                            }}
+                          >
+                            {project.featured ? 'Remove Featured' : 'Set Featured'}
+                          </button>
+                          <button className="admin-project-menu-item admin-project-menu-item-danger" onClick={() => setDeleteTarget(project)}>Delete Project</button>
+                        </div>
+                      </details>
+                    </div>
                   </div>
-                </div>
-                <p className="admin-entity-description">{project.shortDescription}</p>
-                <div className="admin-entity-actions admin-entity-actions-wrap">
-                  <button className="admin-entity-btn admin-entity-btn-edit" onClick={() => onEdit(project)}>Edit</button>
-                  <button className="admin-entity-btn admin-entity-btn-delete" onClick={() => setDeleteTarget(project)}>Delete</button>
-                  <button className="admin-entity-btn admin-entity-btn-toggle" onClick={() => { upsertProject({ ...project, isActive: !project.isActive }, project.id); setSuccess('Project status updated.') }}>Toggle Status</button>
-                  <button className="admin-entity-btn admin-entity-btn-toggle" onClick={() => { upsertProject({ ...project, featured: !project.featured }, project.id); setSuccess('Project featured flag updated.') }}>Toggle Featured</button>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="admin-form-card admin-form-card-projects">
-          <h3 className="admin-form-title">{editing ? 'Edit Project' : 'Add Project'}</h3>
-          <p className="admin-form-subtitle">Required fields: title, short/full description, thumbnail, display order.</p>
+        {isFormOpen ? <button className="admin-projects-drawer-backdrop" type="button" aria-label="Close project form" onClick={onCloseForm} /> : null}
 
-          <form className="admin-form-root admin-form-scroll" onSubmit={onSubmit}>
+        <aside className={`admin-form-card admin-form-card-projects admin-projects-drawer ${isFormOpen ? 'is-open' : ''}`}>
+          <div className="admin-projects-drawer-shell">
+            <div className="admin-projects-drawer-head">
+              <div>
+                <h3 className="admin-form-title">{editing ? 'Edit Project' : 'Add Project'}</h3>
+                <p className="admin-form-subtitle admin-projects-drawer-subtitle">Required fields: title, short/full description, thumbnail, display order.</p>
+              </div>
+              <button className="admin-form-btn admin-form-btn-secondary" type="button" onClick={onCloseForm}>Close</button>
+            </div>
+
+            <form className="admin-form-root admin-projects-drawer-form" onSubmit={onSubmit}>
+              <div className="admin-projects-drawer-body">
             <div className="admin-form-section">
               <h4 className="admin-form-section-title">Project Basics</h4>
               <div className="admin-form-grid admin-form-grid-1">
@@ -241,7 +307,8 @@ export default function AdminProjectsPage() {
                 </div>
 
                 <div className="admin-form-field admin-form-field-full">
-                  <p className="admin-form-note">Select the main image from the gallery selector above. To manage gallery images, edit an existing project with images or update the global gallery.</p>
+                  <label className="admin-form-label">Image URL (optional)</label>
+                  <input className="admin-form-input" value={form.thumbnail} onChange={(event) => setForm((prev) => ({ ...prev, thumbnail: event.target.value }))} placeholder="https://..." />
                 </div>
               </div>
             </div>
@@ -322,7 +389,7 @@ export default function AdminProjectsPage() {
             </div>
 
             <div className="admin-form-section">
-              <h4 className="admin-form-section-title">Project Details</h4>
+              <h4 className="admin-form-section-title">Ordering</h4>
               <div className="admin-form-grid admin-form-grid-3">
                 <div className="admin-form-field">
                   <label className="admin-form-label">Display Order *</label>
@@ -347,20 +414,25 @@ export default function AdminProjectsPage() {
               </div>
             </div>
 
-            <div className="admin-form-checkbox-row">
+            <div className="admin-form-section">
+              <h4 className="admin-form-section-title">Status / Featured</h4>
+              <div className="admin-form-checkbox-row">
               <label className="admin-form-checkbox-label"><input type="checkbox" checked={form.isActive} onChange={(event) => setForm((prev) => ({ ...prev, isActive: event.target.checked }))} /> <span>Active</span></label>
               <label className="admin-form-checkbox-label"><input type="checkbox" checked={form.featured} onChange={(event) => setForm((prev) => ({ ...prev, featured: event.target.checked }))} /> <span>Featured</span></label>
+              </div>
             </div>
+              </div>
 
-            {error ? <p className="admin-form-error">{error}</p> : null}
-            {success ? <p className="admin-form-success">{success}</p> : null}
-
-            <div className="admin-form-actions">
-              <button className="admin-form-btn admin-form-btn-primary" type="submit">{editing ? 'Update Project' : 'Add Project'}</button>
-              <button className="admin-form-btn admin-form-btn-secondary" type="button" onClick={onReset}>Reset</button>
+              <div className="admin-projects-drawer-footer">
+                {error ? <p className="admin-form-error">{error}</p> : null}
+                <div className="admin-form-actions">
+                  <button className="admin-form-btn admin-form-btn-primary" type="submit">{editing ? 'Update Project' : 'Add Project'}</button>
+                  <button className="admin-form-btn admin-form-btn-secondary" type="button" onClick={onReset}>Reset</button>
+                </div>
+              </div>
+            </form>
             </div>
-          </form>
-        </section>
+        </aside>
       </div>
 
       <ConfirmModal

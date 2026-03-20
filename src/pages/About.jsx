@@ -44,8 +44,36 @@ const interestItems = [
   { label: 'Travel', icon: FaPlane },
 ]
 
+const defaultBioParagraphs = [
+  "I'm a passionate and results driven professional who believes in delivering quality work that truly makes an impact.",
+  "With a strong background in technology, design, and digital innovation, I specialize in creating practical, high performing solutions tailored to each client's unique goals.",
+  "I take pride in clear communication, creative problem solving, and a commitment to exceeding expectations on every project. My focus is always on building long-term partnerships through reliability, professionalism, and exceptional results.",
+]
+
+function getBioParagraphs(content) {
+  if (!content?.trim()) return defaultBioParagraphs
+
+  const blocks = content
+    .split(/\n{2,}/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+
+  if (blocks.length > 1) return blocks
+
+  const sentences = content.match(/[^.!?]+[.!?]?/g)?.map((s) => s.trim()).filter(Boolean) || [content.trim()]
+  if (sentences.length < 4) return [content.trim()]
+
+  const chunkSize = Math.ceil(sentences.length / 3)
+  const chunks = []
+  for (let i = 0; i < sentences.length; i += chunkSize) {
+    chunks.push(sentences.slice(i, i + chunkSize).join(' '))
+  }
+  return chunks
+}
+
 export default function About(){
   const { settings } = usePortfolioData()
+  const bioParagraphs = getBioParagraphs(settings.aboutContent)
 
   return (
     <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="about-v2">
@@ -61,12 +89,21 @@ export default function About(){
             <h3 className="about-v2__hello">Hello, I'm {settings.fullName}</h3>
             <p className="about-v2__tagline">{settings.professionalTagline || 'Consistency Makes a Man Perfect in Their Skill Set.'}</p>
 
+            <div className="about-v2__bio">
+              {bioParagraphs.map((paragraph, index) => (
+                <p key={`${paragraph.slice(0, 20)}-${index}`} className={`about-v2__bio-paragraph ${index === 0 ? 'about-v2__bio-lead' : ''}`}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="about-v2__photo">
             <div className="about-v2__image-wrap">
               <div className="about-v2__image-ring" style={{ backgroundImage: `url(${settings.heroImage || '/Atif1.png'})` }} />
             </div>
-
-            <p className="about-v2__bio">{settings.aboutContent || "I'm a passionate and results driven professional who believes in delivering quality work that truly makes an impact. With a strong background in technology, design, and digital innovation, I specialize in creating practical, high performing solutions tailored to each client's unique goals. I take pride in clear communication, creative problem solving, and a commitment to exceeding expectations on every project. My focus is always on building long-term partnerships through reliability, professionalism, and exceptional results."}</p>
           </div>
+
         </div>
       </section>
 
