@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import TechStack from '../components/TechStack'
@@ -8,13 +8,22 @@ import './home.css'
 
 export default function Home() {
   const navigate = useNavigate()
-  const { settings, sortedSocialLinks, sortedServices, sortedProjects } = usePortfolioData()
+  const { settings, sortedSocialLinks } = usePortfolioData()
 
   const resumeUrl = settings.resumeLink?.trim() || '/Atif CV.pdf'
   const isLocalResume = resumeUrl.startsWith('/')
   const publicSocialLinks = sortedSocialLinks.filter((link) => link.isActive)
-  const servicesPreview = useMemo(() => sortedServices.filter((service) => service.isActive).slice(0, 3), [sortedServices])
-  const featuredProjects = useMemo(() => sortedProjects.filter((project) => project.isActive).slice(0, 3), [sortedProjects])
+  const normalizePlatform = (value) => String(value || '').toLowerCase().replace(/\s+/g, '').trim()
+  const getSocialPriority = (value) => {
+    const key = normalizePlatform(value)
+
+    if (key.includes('linkedin')) return 1
+    if (key.includes('github')) return 2
+    if (key.includes('twitter') || key === 'x' || key.includes('twitter/x') || key.includes('twitterx')) return 3
+    if (key.includes('youtube')) return 4
+
+    return undefined
+  }
 
   const testimonials = [
     {
@@ -35,7 +44,44 @@ export default function Home() {
       role: 'Business Owner',
       text: 'Great technical depth and modern design sense. The workflow was smooth from planning to handover.',
     },
+    {
+      id: 't-4',
+      name: 'Client Feedback',
+      role: 'CTO, SaaS Platform',
+      text: 'Excellent architecture decisions and strong ownership from kickoff to launch. Performance stayed stable even under heavy load.',
+    },
+    {
+      id: 't-5',
+      name: 'Client Feedback',
+      role: 'E-commerce Lead',
+      text: 'Our conversion flow became faster and cleaner after the redesign. Delivery was timely and communication was always clear.',
+    },
+    {
+      id: 't-6',
+      name: 'Client Feedback',
+      role: 'Marketing Director',
+      text: 'The final product looked premium, loaded quickly, and matched our brand perfectly. We appreciated the proactive suggestions.',
+    },
+    {
+      id: 't-7',
+      name: 'Client Feedback',
+      role: 'Operations Manager',
+      text: 'Reliable execution and smooth handover. Documentation and post-delivery support made onboarding our team very easy.',
+    },
+    {
+      id: 't-8',
+      name: 'Client Feedback',
+      role: 'Agency Partner',
+      text: 'Great balance of design quality and engineering discipline. Every milestone was delivered with impressive consistency.',
+    },
   ]
+
+  const marqueeTestimonials = [...testimonials, ...testimonials]
+  const followMeLinks = publicSocialLinks
+    .filter((link) => getSocialPriority(link.platform) !== undefined)
+    .sort((a, b) => {
+      return getSocialPriority(a.platform) - getSocialPriority(b.platform)
+    })
 
   return (
     <motion.section
@@ -105,32 +151,17 @@ export default function Home() {
         </section>
 
         <section className="home-v2__section">
-          <div className="home-v2__section-head">
-            <h2>Services I Offer</h2>
-            <button onClick={() => navigate('/services')}>View All</button>
-          </div>
-          <div className="home-v2__cards-grid">
-            {servicesPreview.map((service) => (
-              <article key={service.id} className="card-shell home-v2__item-card">
-                <h3>{service.title}</h3>
-                <p>{service.shortDescription}</p>
+          <h2 className="home-v2__section-title">What Clients Say</h2>
+          <div className="home-v2__testimonials-marquee">
+            <div className="home-v2__testimonials-track">
+              {marqueeTestimonials.map((item, index) => (
+              <article key={`${item.id}-${index}`} className="card-shell home-v2__testimonial-card">
+                <p className="home-v2__quote">“{item.text}”</p>
+                <p className="home-v2__quote-name">{item.name}</p>
+                <p className="home-v2__quote-role">{item.role}</p>
               </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="home-v2__section">
-          <div className="home-v2__section-head">
-            <h2>Featured Projects</h2>
-            <button onClick={() => navigate('/projects')}>View All</button>
-          </div>
-          <div className="home-v2__cards-grid">
-            {featuredProjects.map((project) => (
-              <article key={project.id} className="card-shell home-v2__item-card">
-                <h3>{project.title}</h3>
-                <p>{project.shortDescription}</p>
-              </article>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -142,23 +173,10 @@ export default function Home() {
         </section>
 
         <section className="home-v2__section">
-          <h2 className="home-v2__section-title">What Clients Say</h2>
-          <div className="home-v2__cards-grid">
-            {testimonials.map((item) => (
-              <article key={item.id} className="card-shell home-v2__item-card">
-                <p className="home-v2__quote">“{item.text}”</p>
-                <p className="home-v2__quote-name">{item.name}</p>
-                <p className="home-v2__quote-role">{item.role}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="home-v2__section">
           <div className="card-shell home-v2__social-card">
             <h2 className="home-v2__section-title">Follow Me</h2>
             <div className="home-v2__social-grid">
-              {publicSocialLinks.map((link) => {
+              {followMeLinks.map((link) => {
                 const Icon = getSocialIcon(link.icon)
                 return (
                   <a key={link.id} className="home-v2__social-item" href={link.url} target="_blank" rel="noreferrer">
