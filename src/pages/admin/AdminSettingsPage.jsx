@@ -12,7 +12,7 @@ export default function AdminSettingsPage() {
     setForm(settings)
   }, [settings])
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault()
     setError('')
     setSuccess('')
@@ -22,8 +22,12 @@ export default function AdminSettingsPage() {
     if (!form.email.trim()) return setError('Email address is required.')
     if (!/.+@.+\..+/.test(form.email.trim())) return setError('Please provide a valid email address.')
 
-    updateSettings(form)
-    setSuccess('Portfolio settings updated successfully.')
+    try {
+      await updateSettings(form)
+      setSuccess('Portfolio settings updated successfully.')
+    } catch {
+      setError('Unable to save settings right now. Please try again.')
+    }
   }
 
   return (

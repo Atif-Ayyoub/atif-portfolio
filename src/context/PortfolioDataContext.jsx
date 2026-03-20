@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DEFAULT_MESSAGES,
   DEFAULT_PROJECTS,
@@ -6,6 +6,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_SOCIAL_LINKS,
 } from '../admin/seedData'
+import { supabase } from '../lib/supabaseClient'
 
 const STORAGE_KEYS = {
   services: 'portfolio_services_v1',
@@ -47,10 +48,76 @@ export function PortfolioDataProvider({ children }) {
   const [settings, setSettings] = useState(() => parseStoredValue(STORAGE_KEYS.settings, DEFAULT_SETTINGS))
   const [socialLinks, setSocialLinks] = useState(() => parseStoredValue(STORAGE_KEYS.socialLinks, DEFAULT_SOCIAL_LINKS))
   const [messages, setMessages] = useState(() => parseStoredValue(STORAGE_KEYS.messages, DEFAULT_MESSAGES))
+  const hasSupabase = Boolean(supabase && typeof supabase.from === 'function')
+  const settingsRef = useRef(settings)
+
+  useEffect(() => {
+    settingsRef.current = settings
+  }, [settings])
 
   const persist = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value))
   }
+
+  const mapDbMessageToApp = (row) => ({
+    id: row.id,
+    fullName: sanitizeText(row.full_name),
+    email: sanitizeText(row.email),
+    subject: sanitizeText(row.subject),
+    message: sanitizeText(row.message),
+    submittedAt: row.submitted_at,
+    isRead: Boolean(row.is_read),
+  })
+
+  useEffect(() => {
+    if (!hasSupabase) return
+
+    let isCancelled = false
+
+    async function loadPersistentData() {
+      const [settingsResult, messagesResult] = await Promise.all([
+        supabase.from('app_settings').select('data').eq('id', 1).maybeSingle(),
+        supabase
+          .from('contact_messages')
+          .select('id, full_name, email, subject, message, submitted_at, is_read')
+          .order('submitted_at', { ascending: false }),
+      ])
+
+      if (isCancelled) return
+
+      if (!settingsResult.error) {
+        if (settingsResult.data?.data && typeof settingsResult.data.data === 'object') {
+          const mergedSettings = {
+            ...DEFAULT_SETTINGS,
+            ...settingsResult.data.data,
+          }
+          setSettings(mergedSettings)
+          persist(STORAGE_KEYS.settings, mergedSettings)
+        } else {
+          await supabase.from('app_settings').upsert(
+            {
+              id: 1,
+              data: settingsRef.current,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'id' },
+          )
+        }
+      }
+
+      if (!messagesResult.error && Array.isArray(messagesResult.data)) {
+        const mappedMessages = messagesResult.data.map(mapDbMessageToApp)
+        setMessages(mappedMessages)
+        persist(STORAGE_KEYS.messages, mappedMessages)
+      }
+    }
+
+    loadPersistentData()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [hasSupabase])
 
   const upsertService = (service, id) => {
     const now = new Date().toISOString()
@@ -134,13 +201,26 @@ export function PortfolioDataProvider({ children }) {
     persist(STORAGE_KEYS.projects, next)
   }
 
-  const updateSettings = (nextSettings) => {
+  const updateSettings = async (nextSettings) => {
     const cleaned = {
       ...settings,
       ...Object.fromEntries(
         Object.entries(nextSettings || {}).map(([key, value]) => [key, sanitizeText(value)]),
       ),
     }
+
+    if (hasSupabase) {
+      const { error } = await supabase.from('app_settings').upsert(
+        {
+          id: 1,
+          data: cleaned,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'id' },
+      )
+      if (error) throw error
+    }
+
     setSettings(cleaned)
     persist(STORAGE_KEYS.settings, cleaned)
     return cleaned
@@ -170,32 +250,77 @@ export function PortfolioDataProvider({ children }) {
     persist(STORAGE_KEYS.socialLinks, next)
   }
 
-  const addMessage = (message) => {
-    const nextMessage = {
-      id: getId('msg'),
-      fullName: sanitizeText(message.fullName),
+  const addMessage = async (message) => {
+    const nextMessagePayload = {
+      full_name: sanitizeText(message.fullName),
       email: sanitizeText(message.email),
       subject: sanitizeText(message.subject),
       message: sanitizeText(message.message),
+      is_read: false,
+    }
+
+    if (hasSupabase) {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert([nextMessagePayload])
+        .select('id, full_name, email, subject, message, submitted_at, is_read')
+        .single()
+
+      if (error) throw error
+
+      const savedMessage = mapDbMessageToApp(data)
+      setMessages((prev) => {
+        const next = [savedMessage, ...prev]
+        persist(STORAGE_KEYS.messages, next)
+        return next
+      })
+      return savedMessage
+    }
+
+    const nextMessage = {
+      id: getId('msg'),
+      fullName: nextMessagePayload.full_name,
+      email: nextMessagePayload.email,
+      subject: nextMessagePayload.subject,
+      message: nextMessagePayload.message,
       submittedAt: new Date().toISOString(),
       isRead: false,
     }
-    const next = [nextMessage, ...messages]
-    setMessages(next)
-    persist(STORAGE_KEYS.messages, next)
+    setMessages((prev) => {
+      const next = [nextMessage, ...prev]
+      persist(STORAGE_KEYS.messages, next)
+      return next
+    })
     return nextMessage
   }
 
-  const updateMessageStatus = (id, isRead) => {
-    const next = messages.map((item) => (item.id === id ? { ...item, isRead } : item))
-    setMessages(next)
-    persist(STORAGE_KEYS.messages, next)
+  const updateMessageStatus = async (id, isRead) => {
+    if (hasSupabase) {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ is_read: isRead })
+        .eq('id', id)
+      if (error) throw error
+    }
+
+    setMessages((prev) => {
+      const next = prev.map((item) => (item.id === id ? { ...item, isRead } : item))
+      persist(STORAGE_KEYS.messages, next)
+      return next
+    })
   }
 
-  const deleteMessage = (id) => {
-    const next = messages.filter((item) => item.id !== id)
-    setMessages(next)
-    persist(STORAGE_KEYS.messages, next)
+  const deleteMessage = async (id) => {
+    if (hasSupabase) {
+      const { error } = await supabase.from('contact_messages').delete().eq('id', id)
+      if (error) throw error
+    }
+
+    setMessages((prev) => {
+      const next = prev.filter((item) => item.id !== id)
+      persist(STORAGE_KEYS.messages, next)
+      return next
+    })
   }
 
   const resetAllData = () => {

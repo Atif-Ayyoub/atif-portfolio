@@ -10,7 +10,7 @@ export default function Contact(){
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault()
     setError('')
     setSuccess('')
@@ -25,9 +25,13 @@ export default function Contact(){
       return
     }
 
-    addMessage(form)
-    setSuccess('Message sent successfully. Thank you!')
-    setForm({ fullName: '', email: '', subject: '', message: '', website: '' })
+    try {
+      await addMessage(form)
+      setSuccess('Message sent successfully. Thank you!')
+      setForm({ fullName: '', email: '', subject: '', message: '', website: '' })
+    } catch {
+      setError('Unable to send your message right now. Please try again.')
+    }
   }
 
   return (

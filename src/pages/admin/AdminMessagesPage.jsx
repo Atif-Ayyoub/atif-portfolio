@@ -9,6 +9,7 @@ export default function AdminMessagesPage() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [actionError, setActionError] = useState('')
 
   const filteredMessages = useMemo(() => {
     return messages.filter((message) => {
@@ -17,12 +18,18 @@ export default function AdminMessagesPage() {
     })
   }, [messages, query])
 
-  const onDelete = () => {
-    deleteMessage(deleteTarget.id)
-    if (selected?.id === deleteTarget.id) {
-      setSelected(null)
+  const onDelete = async () => {
+    if (!deleteTarget?.id) return
+    setActionError('')
+    try {
+      await deleteMessage(deleteTarget.id)
+      if (selected?.id === deleteTarget.id) {
+        setSelected(null)
+      }
+      setDeleteTarget(null)
+    } catch {
+      setActionError('Unable to delete this message right now. Please try again.')
     }
-    setDeleteTarget(null)
   }
 
   return (
@@ -90,9 +97,14 @@ export default function AdminMessagesPage() {
                 <div className="admin-message-detail-actions">
                   <button
                     className="admin-entity-btn admin-entity-btn-toggle"
-                    onClick={() => {
-                      updateMessageStatus(selected.id, !selected.isRead)
-                      setSelected((prev) => ({ ...prev, isRead: !prev.isRead }))
+                    onClick={async () => {
+                      setActionError('')
+                      try {
+                        await updateMessageStatus(selected.id, !selected.isRead)
+                        setSelected((prev) => ({ ...prev, isRead: !prev.isRead }))
+                      } catch {
+                        setActionError('Unable to update message status right now. Please try again.')
+                      }
                     }}
                   >
                     Mark as {selected.isRead ? 'Unread' : 'Read'}
@@ -101,6 +113,7 @@ export default function AdminMessagesPage() {
                     Delete
                   </button>
                 </div>
+                {actionError ? <p className="admin-form-error">{actionError}</p> : null}
               </>
             ) : null}
           </section>
