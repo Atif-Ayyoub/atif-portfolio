@@ -100,7 +100,9 @@ export function PortfolioDataProvider({ children }) {
             .split(',')
             .map((tech) => sanitizeText(tech))
             .filter(Boolean),
-      category: sanitizeText(project.category),
+      category: Array.isArray(project.categories)
+        ? project.categories.map((c) => sanitizeText(c)).filter(Boolean).join(',')
+        : sanitizeText(project.category),
       liveUrl: sanitizeText(project.liveUrl),
       githubUrl: sanitizeText(project.githubUrl),
       caseStudyUrl: sanitizeText(project.caseStudyUrl),

@@ -10,6 +10,7 @@ const emptyForm = {
   fullDescription: '',
   thumbnail: '',
   galleryImages: [],
+  categories: [],
   technologies: '',
   category: '',
   liveUrl: '',
@@ -44,7 +45,8 @@ export default function AdminProjectsPage() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyForm)
-  const [newGalleryImage, setNewGalleryImage] = useState('')
+  const [tagInput, setTagInput] = useState('')
+  const [thumbnailFile, setThumbnailFile] = useState(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -76,15 +78,45 @@ export default function AdminProjectsPage() {
     setForm({
       ...project,
       technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
+      categories: Array.isArray(project.category)
+        ? project.category
+        : typeof project.category === 'string' && project.category.includes(',')
+        ? project.category.split(',').map((s) => s.trim()).filter(Boolean)
+        : project.category
+        ? [project.category]
+        : [],
     })
+    setThumbnailFile(null)
     setError('')
     setSuccess('')
+  }
+
+  const handleMainImageFile = (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const preview = URL.createObjectURL(file)
+    setThumbnailFile(file)
+    setForm((prev) => ({ ...prev, thumbnail: preview }))
+  }
+
+  const addTag = (tag) => {
+    const value = (tag || '').trim()
+    if (!value) return
+    const current = (form.technologies || '').split(',').map((s) => s.trim()).filter(Boolean)
+    if (current.includes(value)) return
+    setForm((prev) => ({ ...prev, technologies: [...current, value].join(', ') }))
+    setTagInput('')
+  }
+
+  const removeTag = (tag) => {
+    const current = (form.technologies || '').split(',').map((s) => s.trim()).filter(Boolean)
+    setForm((prev) => ({ ...prev, technologies: current.filter((t) => t !== tag).join(', ') }))
   }
 
   const onReset = () => {
     setEditing(null)
     setForm(emptyForm)
-    setNewGalleryImage('')
+    setThumbnailFile(null)
     setError('')
   }
 
@@ -96,11 +128,10 @@ export default function AdminProjectsPage() {
     if (!form.title.trim()) return setError('Project title is required.')
     if (!form.shortDescription.trim()) return setError('Short description is required.')
     if (!form.fullDescription.trim()) return setError('Full description is required.')
-    if (!form.thumbnail.trim()) return setError('Main thumbnail URL is required.')
-    if (!isValidUrl(form.thumbnail)) return setError('Thumbnail must be a valid URL.')
+    if (!form.thumbnail?.trim() && !thumbnailFile) return setError('Main image is required.')
+    if (form.thumbnail && !thumbnailFile && !isValidUrl(form.thumbnail)) return setError('Thumbnail must be a valid URL.')
     if (!isValidUrl(form.liveUrl)) return setError('Live demo URL must be valid.')
     if (!isValidUrl(form.githubUrl)) return setError('GitHub/source URL must be valid.')
-    if (!isValidUrl(form.caseStudyUrl)) return setError('Case study URL must be valid.')
     if (Number.isNaN(Number(form.displayOrder))) return setError('Display order must be numeric.')
 
     upsertProject(
@@ -178,19 +209,25 @@ export default function AdminProjectsPage() {
           <form className="admin-form-root admin-form-scroll" onSubmit={onSubmit}>
             <div className="admin-form-section">
               <h4 className="admin-form-section-title">Project Basics</h4>
-              <div className="admin-form-grid admin-form-grid-2">
+              <div className="admin-form-grid admin-form-grid-1">
                 <div className="admin-form-field admin-form-field-full">
                   <label className="admin-form-label">Project Title *</label>
                   <input className="admin-form-input" value={form.title} onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))} />
                 </div>
+
                 <div className="admin-form-field admin-form-field-full">
                   <label className="admin-form-label">Short Description *</label>
                   <textarea className="admin-form-textarea admin-form-textarea-sm" value={form.shortDescription} onChange={(event) => setForm((prev) => ({ ...prev, shortDescription: event.target.value }))} />
                 </div>
+
+                {/* Thumbnail handled below in Media section - removed file upload */}
+
                 <div className="admin-form-field admin-form-field-full">
                   <label className="admin-form-label">Full Description *</label>
                   <textarea className="admin-form-textarea" value={form.fullDescription} onChange={(event) => setForm((prev) => ({ ...prev, fullDescription: event.target.value }))} />
                 </div>
+
+                {/* Languages selection removed here; use Technology section below to manage tags */}
               </div>
             </div>
 
@@ -198,45 +235,13 @@ export default function AdminProjectsPage() {
               <h4 className="admin-form-section-title">Media</h4>
               <div className="admin-form-grid admin-form-grid-2">
                 <div className="admin-form-field">
-                  <label className="admin-form-label">Thumbnail URL *</label>
-                  <input className="admin-form-input" value={form.thumbnail} onChange={(event) => setForm((prev) => ({ ...prev, thumbnail: event.target.value }))} placeholder="https://..." />
+                  <label className="admin-form-label">Select main image file *</label>
+                  <input type="file" accept="image/*" className="admin-form-input" onChange={handleMainImageFile} />
+                  {thumbnailFile ? <p className="admin-form-note">Selected file: {thumbnailFile.name}</p> : null}
                 </div>
-                <div className="admin-form-field">
-                  <label className="admin-form-label">Category</label>
-                  <input className="admin-form-input" value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} />
-                </div>
+
                 <div className="admin-form-field admin-form-field-full">
-                  <label className="admin-form-label">Gallery Image URL</label>
-                  <div className="admin-form-inline-row">
-                    <input className="admin-form-input" value={newGalleryImage} onChange={(event) => setNewGalleryImage(event.target.value)} placeholder="https://..." />
-                    <button
-                      type="button"
-                      className="admin-form-btn admin-form-btn-secondary"
-                      onClick={() => {
-                        if (!newGalleryImage.trim()) return
-                        if (!isValidUrl(newGalleryImage.trim())) {
-                          setError('Gallery image URL must be valid.')
-                          return
-                        }
-                        setForm((prev) => ({ ...prev, galleryImages: [...(prev.galleryImages || []), newGalleryImage.trim()] }))
-                        setNewGalleryImage('')
-                      }}
-                    >
-                      Add Image
-                    </button>
-                  </div>
-                  <div className="admin-chip-row">
-                    {(form.galleryImages || []).map((url) => (
-                      <button
-                        key={url}
-                        type="button"
-                        className="admin-chip"
-                        onClick={() => setForm((prev) => ({ ...prev, galleryImages: prev.galleryImages.filter((item) => item !== url) }))}
-                      >
-                        Remove image
-                      </button>
-                    ))}
-                  </div>
+                  <p className="admin-form-note">Select the main image from the gallery selector above. To manage gallery images, edit an existing project with images or update the global gallery.</p>
                 </div>
               </div>
             </div>
@@ -245,8 +250,22 @@ export default function AdminProjectsPage() {
               <h4 className="admin-form-section-title">Technology</h4>
               <div className="admin-form-grid admin-form-grid-2">
                 <div className="admin-form-field">
-                  <label className="admin-form-label">Technologies (comma separated)</label>
-                  <input className="admin-form-input" value={form.technologies} onChange={(event) => setForm((prev) => ({ ...prev, technologies: event.target.value }))} placeholder="React, Node.js" />
+                  <label className="admin-form-label">Technologies / Languages</label>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input
+                      className="admin-form-input"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(tagInput) } }}
+                      placeholder="Type a tech and press Enter (e.g. Laravel)"
+                    />
+                    <button type="button" className="admin-form-btn admin-form-btn-secondary" onClick={() => addTag(tagInput)}>Add</button>
+                  </div>
+                  <div className="admin-chip-row" style={{ marginTop: '10px' }}>
+                    {(form.technologies || '').split(',').map(s => s.trim()).filter(Boolean).map((t) => (
+                      <button key={t} type="button" className="admin-chip" onClick={() => removeTag(t)}>{t} &times;</button>
+                    ))}
+                  </div>
                 </div>
                 <div className="admin-form-field">
                   <label className="admin-form-label">Project Status</label>
@@ -254,6 +273,35 @@ export default function AdminProjectsPage() {
                     <option value="completed">Completed</option>
                     <option value="in progress">In Progress</option>
                   </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-form-section">
+              <h4 className="admin-form-section-title">Categories</h4>
+              <div className="admin-form-grid admin-form-grid-1">
+                <div className="admin-form-field admin-form-field-full">
+                  <label className="admin-form-label">Select categories</label>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
+                    {['Web Apps', 'Mobile Apps', 'AI Tools', 'Dashboards', 'APIs'].map((opt) => {
+                      const checked = (form.categories || []).includes(opt)
+                      return (
+                        <label key={opt} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              const current = form.categories || []
+                              const next = current.includes(opt) ? current.filter((c) => c !== opt) : [...current, opt]
+                              setForm((prev) => ({ ...prev, categories: next }))
+                            }}
+                          />
+                          <span>{opt}</span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  <p className="admin-form-note" style={{ marginTop: '8px' }}>Selected: {(form.categories || []).join(', ') || '—'}</p>
                 </div>
               </div>
             </div>
@@ -269,10 +317,7 @@ export default function AdminProjectsPage() {
                   <label className="admin-form-label">GitHub / Source URL</label>
                   <input className="admin-form-input" value={form.githubUrl} onChange={(event) => setForm((prev) => ({ ...prev, githubUrl: event.target.value }))} />
                 </div>
-                <div className="admin-form-field admin-form-field-full">
-                  <label className="admin-form-label">Case Study URL</label>
-                  <input className="admin-form-input" value={form.caseStudyUrl} onChange={(event) => setForm((prev) => ({ ...prev, caseStudyUrl: event.target.value }))} />
-                </div>
+                {/* Case Study URL removed per request */}
               </div>
             </div>
 
@@ -298,18 +343,7 @@ export default function AdminProjectsPage() {
                   <label className="admin-form-label">Client Name</label>
                   <input className="admin-form-input" value={form.clientName} onChange={(event) => setForm((prev) => ({ ...prev, clientName: event.target.value }))} />
                 </div>
-                <div className="admin-form-field">
-                  <label className="admin-form-label">Role In Project</label>
-                  <input className="admin-form-input" value={form.role} onChange={(event) => setForm((prev) => ({ ...prev, role: event.target.value }))} />
-                </div>
-                <div className="admin-form-field admin-form-field-full">
-                  <label className="admin-form-label">Project Highlights</label>
-                  <textarea className="admin-form-textarea admin-form-textarea-sm" value={form.highlights} onChange={(event) => setForm((prev) => ({ ...prev, highlights: event.target.value }))} />
-                </div>
-                <div className="admin-form-field admin-form-field-full">
-                  <label className="admin-form-label">Challenges and Solutions</label>
-                  <textarea className="admin-form-textarea admin-form-textarea-sm" value={form.challengesSolutions} onChange={(event) => setForm((prev) => ({ ...prev, challengesSolutions: event.target.value }))} />
-                </div>
+                {/* Role, Highlights and Challenges removed as requested */}
               </div>
             </div>
 

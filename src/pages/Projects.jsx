@@ -24,10 +24,14 @@ export default function Projects(){
   const filters = ['All', 'Web Apps', 'Mobile Apps', 'AI Tools', 'Dashboards', 'APIs']
 
   const [active, setActive] = useState('All')
-  const filtered = useMemo(
-    () => (active === 'All' ? publicProjects : publicProjects.filter((project) => project.category === active)),
-    [active, publicProjects],
-  )
+  const filtered = useMemo(() => {
+    if (active === 'All') return publicProjects
+    return publicProjects.filter((project) => {
+      const raw = project.category || ''
+      const list = Array.isArray(raw) ? raw : String(raw).split(',').map((s) => s.trim()).filter(Boolean)
+      return list.includes(active)
+    })
+  }, [active, publicProjects])
   const featured = filtered[0] || publicProjects[0]
   const side = filtered.filter((project) => project.id !== featured?.id).slice(0, 4)
   const projectStats = [
