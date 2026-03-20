@@ -15,7 +15,10 @@ export default function Contact(){
     setError('')
     setSuccess('')
 
-    if (form.website) return
+    if (form.website) {
+      setError('Message blocked by spam check. Please refresh and try again.')
+      return
+    }
     if (!form.fullName.trim() || !form.subject.trim() || !form.message.trim()) {
       setError('Please fill all required fields.')
       return
@@ -59,7 +62,7 @@ export default function Contact(){
 
         <div className="follow-card message-card contact-card">
           <div className="follow-title">Send a Message</div>
-          <form className="mt-4" onSubmit={onSubmit}>
+          <form className="mt-4" onSubmit={onSubmit} autoComplete="off">
             <input type="text" name="website" value={form.website} onChange={(event) => setForm((prev) => ({ ...prev, website: event.target.value }))} className="hidden" tabIndex={-1} autoComplete="off" />
 
             <label className="block text-[var(--text-secondary)] mb-2">Full Name *</label>
