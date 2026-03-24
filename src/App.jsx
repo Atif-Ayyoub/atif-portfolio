@@ -26,6 +26,16 @@ export default function App(){
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
 
+  const resetScrollPosition = () => {
+    if (typeof window === 'undefined') return
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    document.documentElement?.scrollTo?.({ top: 0, left: 0, behavior: 'auto' })
+    document.body?.scrollTo?.({ top: 0, left: 0, behavior: 'auto' })
+    document.querySelectorAll('.main-content, .admin-main').forEach((element) => {
+      element.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+    })
+  }
+
   const activePublicNav = (() => {
     if (location.pathname === '/') return 'home'
     if (location.pathname.startsWith('/about')) return 'about'
@@ -47,7 +57,15 @@ export default function App(){
       admin: '/admin/login'
     }
     const path = map[id] || '/'
+    if (path === location.pathname) {
+      resetScrollPosition()
+      return
+    }
     navigate(path)
+    requestAnimationFrame(() => {
+      resetScrollPosition()
+      requestAnimationFrame(resetScrollPosition)
+    })
   }
 
   return (
@@ -114,7 +132,7 @@ export default function App(){
           <Sidebar active={activePublicNav} onNavigate={handleNavigate} />
           <div className="main-content min-h-screen">
             <AnimatePresence mode="wait">
-              <motion.main initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-20}} transition={{duration:0.45}}>
+              <motion.main key={location.pathname} initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-20}} transition={{duration:0.45}}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
