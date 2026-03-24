@@ -48,9 +48,11 @@ export default function AdminProjectsPage() {
   const [form, setForm] = useState(emptyForm)
   const [tagInput, setTagInput] = useState('')
   const [thumbnailFile, setThumbnailFile] = useState(null)
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const UPLOAD_SERVER_URL = import.meta.env.VITE_UPLOAD_SERVER_URL || 'http://localhost:5000'
 
   const categories = useMemo(() => {
     return ['all', ...new Set(projects.map((project) => project.category).filter(Boolean))]
@@ -151,9 +153,46 @@ export default function AdminProjectsPage() {
     if (Number.isNaN(Number(form.displayOrder))) return setError('Display order must be numeric.')
 
     try {
+      let thumbnailUrl = form.thumbnail
+
+      if (thumbnailFile) {
+        setUploadingThumbnail(true)
+
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result)
+          reader.onerror = () => reject(new Error('Unable to read selected image file.'))
+          reader.readAsDataURL(thumbnailFile)
+        })
+
+        const imageName = String(form.title || 'project')
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'project'
+
+        const response = await fetch(`${UPLOAD_SERVER_URL}/api/upload-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl: dataUrl, name: `${imageName}-thumbnail` }),
+        })
+
+        const uploadResult = await response.json().catch(() => null)
+        if (!response.ok || !uploadResult?.url) {
+          throw new Error(uploadResult?.error || 'Unable to upload project image.')
+        }
+
+        thumbnailUrl = uploadResult.url
+      }
+
+      if (thumbnailUrl && !isValidUrl(thumbnailUrl)) {
+        throw new Error('Thumbnail must be a valid URL.')
+      }
+
       await upsertProject(
         {
           ...form,
+          thumbnail: thumbnailUrl,
           technologies: form.technologies,
           galleryImages: form.galleryImages || [],
         },
@@ -162,8 +201,10 @@ export default function AdminProjectsPage() {
       setSuccess(editing ? 'Project updated successfully.' : 'Project created successfully.')
       onReset()
       setIsFormOpen(false)
-    } catch {
-      setError('Unable to save project right now. Please try again.')
+    } catch (submitError) {
+      setError(submitError?.message || 'Unable to save project right now. Please try again.')
+    } finally {
+      setUploadingThumbnail(false)
     }
   }
 
@@ -444,6 +485,7 @@ export default function AdminProjectsPage() {
 
               <div className="admin-projects-drawer-footer">
                 {error ? <p className="admin-form-error">{error}</p> : null}
+                {uploadingThumbnail ? <p className="admin-form-success">Uploading project image…</p> : null}
                 <div className="admin-form-actions">
                   <button className="admin-form-btn admin-form-btn-primary" type="submit">{editing ? 'Update Project' : 'Add Project'}</button>
                   <button className="admin-form-btn admin-form-btn-secondary" type="button" onClick={onReset}>Reset</button>
