@@ -6,7 +6,7 @@ import { usePortfolioData } from '../context/PortfolioDataContext'
 export default function Contact(){
   const { sortedSocialLinks, addMessage } = usePortfolioData()
   const publicSocialLinks = sortedSocialLinks.filter((link) => link.isActive)
-  const [form, setForm] = useState({ fullName: '', email: '', subject: '', message: '', website: '' })
+  const [form, setForm] = useState({ fullName: '', email: '', subject: '', message: '' })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -15,10 +15,6 @@ export default function Contact(){
     setError('')
     setSuccess('')
 
-    if (form.website) {
-      setError('Message blocked by spam check. Please refresh and try again.')
-      return
-    }
     if (!form.fullName.trim() || !form.subject.trim() || !form.message.trim()) {
       setError('Please fill all required fields.')
       return
@@ -31,7 +27,7 @@ export default function Contact(){
     try {
       await addMessage(form)
       setSuccess('Message sent successfully. Thank you!')
-      setForm({ fullName: '', email: '', subject: '', message: '', website: '' })
+      setForm({ fullName: '', email: '', subject: '', message: '' })
     } catch {
       setError('Unable to send your message right now. Please try again.')
     }
@@ -63,8 +59,6 @@ export default function Contact(){
         <div className="follow-card message-card contact-card">
           <div className="follow-title">Send a Message</div>
           <form className="mt-4" onSubmit={onSubmit} autoComplete="off">
-            <input type="text" name="website" value={form.website} onChange={(event) => setForm((prev) => ({ ...prev, website: event.target.value }))} className="hidden" tabIndex={-1} autoComplete="off" />
-
             <label className="block text-[var(--text-secondary)] mb-2">Full Name *</label>
             <input name="name" required placeholder="Full Name" value={form.fullName} onChange={(event) => setForm((prev) => ({ ...prev, fullName: event.target.value }))} className="w-full bg-[#141B2D] border border-[var(--border)] p-3 rounded-lg text-white mb-4" />
 

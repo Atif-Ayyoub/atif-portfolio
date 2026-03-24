@@ -24,6 +24,18 @@ export default function AdminMessagesPage() {
     })
   }, [refreshMessages])
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      refreshMessages().catch(() => {
+        setActionError('Unable to load messages right now. Please refresh and try again.')
+      })
+    }, 10000)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [refreshMessages])
+
   const onDelete = async () => {
     if (!deleteTarget?.id) return
     setActionError('')
