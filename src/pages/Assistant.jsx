@@ -312,14 +312,46 @@ export default function Assistant() {
   }, [copied])
 
   const detectAndSetProject = (userText) => {
-    // Use fuzzy matching with typo tolerance
-    const detected = detectProjectInText(userText, snapshot.projects)
-    if (detected) {
-      setSelectedProject(detected)
-      return detected
+    // Use fuzzy matching with typo tolerance and confidence scoring
+    const result = detectProjectInText(userText, snapshot.projects)
+
+    console.log('🔍 Project Detection:', {
+      input: userText,
+      detected: result.project,
+      confidence: result.confidence,
+      source: result.source,
+      similarity: result.similarity ? result.similarity.toFixed(2) : 0,
+    })
+
+    if (result.confidence === 'high') {
+      setSelectedProject(result.project)
+      return result
     }
-    return null
+
+    if (result.confidence === 'medium') {
+      // Medium confidence: user should confirm
+      console.warn('⚠️ Medium confidence match - user may need to confirm')
+      setSelectedProject(result.project)
+      return result
+    }
+
+    return result
   }
+
+  // Determine if selected project should be cleared based on intent change
+  const shouldClearProject = (newIntent, previousTopic) => {
+    // Keep project if staying on project-related topics
+    const projectTopics = ['follow_up', 'project_inquiry']
+    const isProjectFocused = projectTopics.includes(newIntent) || projectTopics.includes(previousTopic)
+
+    // Clear project if switching to unrelated services/skills/contact
+    const isTopicSwitch = previousTopic !== newIntent && previousTopic !== 'general' && newIntent !== 'general'
+    const isServiceSwitch = (previousTopic === 'project_inquiry' || previousTopic === 'follow_up') && 
+                           (newIntent === 'service_inquiry' || newIntent === 'skill_inquiry' || newIntent === 'contact_inquiry')
+
+    return isServiceSwitch
+  }
+
 
   const sendMessage = async (prompt = input) => {
     const text = String(prompt || '').trim()
@@ -336,12 +368,20 @@ export default function Assistant() {
     const intent = detectIntent(text)
     const entities = extractEntities(text, snapshot)
 
-    // Detect if user mentioned a project with typo tolerance and update state
-    const detectedProject = detectAndSetProject(text)
-    if (detectedProject) {
-      setSelectedProject(detectedProject)
+    // Detect if user mentioned a project with typo tolerance and confidence scoring
+    const projectResult = detectAndSetProject(text)
+    let activeProject = selectedProject
+
+    // Apply state reset rules: clear project if topic change is unrelated
+    if (shouldClearProject(intent, currentTopic) && !projectResult.project) {
+      console.log('🔄 Clearing project due to topic switch from', currentTopic, 'to', intent)
+      activeProject = null
+      setSelectedProject(null)
+    } else if (projectResult.confidence === 'high' || projectResult.confidence === 'medium') {
+      // High or medium confidence: update selected project
+      activeProject = projectResult.project
+      setSelectedProject(projectResult.project)
     }
-    const activeProject = detectedProject || selectedProject
 
     // Update topic based on intent
     if (intent !== 'general') {
@@ -365,11 +405,17 @@ export default function Assistant() {
       lastMessage: nextMessages[nextMessages.length - 2]?.text || '',
     }
 
-    console.log('📤 User Message:', text)
-    console.log('🎯 Detected Project:', detectedProject)
-    console.log('🎯 Selected Project:', activeProject)
-    console.log('📍 Intent:', intent)
-    console.log('📍 Context:', context)
+    console.log('📤 User Input Analysis:', {
+      text: text,
+      intent: intent,
+      topic: currentTopic,
+      entities: entities,
+      detectedProject: projectResult,
+      selectedProject: activeProject,
+      context: context,
+    })
+
+    console.log('📨 Sending to backend:', { message: text, history: history, context: context })
 
     try {
       const response = await fetch(FALLBACK_API_URL, {

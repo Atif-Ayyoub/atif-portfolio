@@ -41,12 +41,21 @@ export function fuzzyMatchProject(userText, projects) {
       const distance = levenshteinDistance(normalizedInput, normalizedProject)
       const similarity = 1 - distance / Math.max(normalizedInput.length, normalizedProject.length)
 
-      return { project, distance, similarity }
+      // Classify confidence level
+      let confidence = 'low'
+      if (similarity >= 0.85) confidence = 'high'
+      else if (similarity >= 0.7) confidence = 'medium'
+
+      return { project, distance, similarity, confidence }
     })
     .filter((match) => match.similarity >= 0.6) // 60% match threshold
     .sort((a, b) => b.similarity - a.similarity)
 
-  return matches.length > 0 ? matches[0].project : null
+  if (matches.length > 0) {
+    return { project: matches[0].project, confidence: matches[0].confidence, similarity: matches[0].similarity }
+  }
+
+  return { project: null, confidence: 'none', similarity: 0 }
 }
 
 export function detectProjectInText(text, projects) {
@@ -56,7 +65,7 @@ export function detectProjectInText(text, projects) {
   for (const projectName of projectNames) {
     const regex = new RegExp(`\\b${projectName.replace(/\s+/g, '\\s+')}\\b`, 'i')
     if (regex.test(text)) {
-      return projectName
+      return { project: projectName, confidence: 'high', source: 'exact_match' }
     }
   }
 
@@ -65,18 +74,24 @@ export function detectProjectInText(text, projects) {
   for (const word of words) {
     if (word.length > 3) {
       // Only match words longer than 3 chars to avoid false positives
-      const fuzzyMatch = fuzzyMatchProject(word, projects)
-      if (fuzzyMatch) {
-        return fuzzyMatch.title
+      const fuzzyResult = fuzzyMatchProject(word, projects)
+      if (fuzzyResult.confidence === 'high') {
+        return { project: fuzzyResult.project.title, confidence: 'high', source: 'word_fuzzy', similarity: fuzzyResult.similarity }
+      }
+      if (fuzzyResult.confidence === 'medium') {
+        return { project: fuzzyResult.project.title, confidence: 'medium', source: 'word_fuzzy', similarity: fuzzyResult.similarity }
       }
     }
   }
 
   // Try matching full text against all projects
-  const fuzzyMatch = fuzzyMatchProject(text, projects)
-  if (fuzzyMatch) {
-    return fuzzyMatch.title
+  const fuzzyResult = fuzzyMatchProject(text, projects)
+  if (fuzzyResult.confidence === 'high') {
+    return { project: fuzzyResult.project.title, confidence: 'high', source: 'full_text_fuzzy', similarity: fuzzyResult.similarity }
+  }
+  if (fuzzyResult.confidence === 'medium') {
+    return { project: fuzzyResult.project.title, confidence: 'medium', source: 'full_text_fuzzy', similarity: fuzzyResult.similarity }
   }
 
-  return null
+  return { project: null, confidence: 'none', source: 'no_match', similarity: 0 }
 }
