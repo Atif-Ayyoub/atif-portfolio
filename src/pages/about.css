@@ -360,4 +360,73 @@
   .about-v2__section{
     margin-top:80px;
   }
+
+  /* Mobile-specific header improvements */
+  .about-v2__hero-grid{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:20px;
+  }
+
+  .about-v2__copy{
+    text-align:center;
+    width:100%;
+    max-width:520px;
+    padding:0 6px;
+  }
+
+  /* Make sure the profile image doesn't overflow and remains crisp */
+  .about-v2__image-ring{
+    width:40vw;
+    height:40vw;
+    max-width:220px;
+    max-height:220px;
+    border-width:3px;
+    box-shadow:0 8px 24px rgba(99,102,241,0.45);
+    animation:none; /* disable float animation on small devices for performance */
+  }
+
+  /* Ensure paragraphs wrap nicely and are readable on small screens */
+  .about-v2__bio-paragraph{
+    font-size:15px;
+    line-height:1.8;
+  }
+
+  /* Action / icon row (if present) should be touch-friendly and scrollable */
+  .about-v2__actions,
+  .about-v2__action-row{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:6px 4px;
+  }
+
+  .about-v2__actions > *,
+  .about-v2__action-row > *{
+    min-width:44px;
+    min-height:44px;
+    padding:8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    flex:0 0 auto;
+  }
+
+  /* Prevent horizontal overflow */
+  .about-v2__hero-wrap,
+  .about-v2__photo,
+  .about-v2__copy{
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+
+  /* Reduce heavy visual effects to help rendering on low-end devices */
+  .about-v2__glow{ filter: blur(80px); opacity:0.18 }
+  .about-v2__image-ring{ backface-visibility: hidden; transform: translateZ(0) }
 }

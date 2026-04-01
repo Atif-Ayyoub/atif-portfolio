@@ -430,7 +430,8 @@ html { scroll-behavior: smooth }
 /* Mobile-only (narrow) header card and horizontal icons */
 @media (max-width: 767px){
   .sidebar{
-    position:static;
+    /* keep top bar fixed so it remains visible while content scrolls */
+    position:fixed;
     top:0;
     left:0;
     right:0;
@@ -439,22 +440,23 @@ html { scroll-behavior: smooth }
     padding:8px 6px;
     border-right:0;
     border-bottom:0;
-    z-index:40;
+    z-index:60;
     display:flex;
     flex-direction:column;
     align-items:stretch;
+    backdrop-filter: blur(6px);
   }
 
   .sidebar .profile-block{ display:none }
 
   .mobile-header-card{
-    margin-top:14px;
+    margin-top:8px;
     margin-left:0;
     margin-right:0;
-    padding:10px 14px;
+    padding:8px 12px;
     display:flex;
     align-items:center;
-    gap:20px;
+    gap:12px;
     border-radius:12px;
     background: rgba(255,255,255,0.02);
     border:1px solid var(--border);
@@ -466,16 +468,28 @@ html { scroll-behavior: smooth }
   .mobile-header-text h2{ margin:0; font-size:16px; font-weight:700 }
   .mobile-header-text p{ margin:0; font-size:12px; color:var(--muted, #9ca3af) }
 
-  /* present nav icons horizontally below the header card */
-  .nav-menu{ display:flex; flex-direction:row; gap:0; justify-content:center; margin-top:30px; padding:0 10px; width:100%; }
-  .nav-item{ display:flex; align-items:center; justify-content:center; padding:8px; margin:0 10px }
+  /* present nav icons horizontally below the header card; allow scrolling */
+  .nav-menu{ display:flex; flex-direction:row; gap:4px; justify-content:flex-start; margin-top:8px; padding:4px 8px; width:100%; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch }
+  /* hide visible scrollbars but keep scroll functionality */
+  .nav-menu{ -ms-overflow-style: none; /* IE/Edge */
+               scrollbar-width: none; /* Firefox */ }
+  .nav-menu::-webkit-scrollbar{ display: none; height: 0; }
+  .nav-item{ display:inline-flex; align-items:center; justify-content:center; padding:4px; margin:0 4px }
   .collapse-btn{ display:none }
-  .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:12px; align-items:center; flex-wrap:nowrap }
-  .nav-item{ padding:6px; border-radius:8px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center }
-  .nav-item:hover{ transform:none; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff }
+  .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:4px; align-items:center; flex-wrap:nowrap }
+  .nav-item{ padding:4px; border-radius:10px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center; min-width:44px; min-height:44px; box-sizing:border-box }
+  .nav-item:hover{ transform:none }
   .nav-item span{ display:none }
 
-  .main-content{ margin-left:0; width:100%; padding:84px 12px 24px }
+  /* Active item: visible filled background; others remain transparent */
+  .nav-item.active{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; font-weight:600; box-shadow:0 8px 18px rgba(79,70,229,0.12) }
+  .nav-item:not(.active){ background: transparent }
+
+  /* Increase icon size on mobile while preserving 44px touch targets */
+  .nav-item svg{ width:26px; height:26px; font-size:26px; display:block }
+
+  /* Add extra top spacing so page content starts 30px below the fixed top bar */
+  .main-content{ margin-left:0; width:100%; padding:224px 12px 24px }
 }
 
 /* Profile image helper */
