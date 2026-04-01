@@ -19,10 +19,9 @@ export async function loadSession(sessionId) {
     .from('chat_sessions')
     .select('*')
     .eq('session_id', sessionId)
-    .single()
+    .maybeSingle()
 
-  if (error && error.code !== 'PGRST116') {
-    // PGRST116 = no rows, which is ok for new sessions
+  if (error) {
     console.error('Error loading session:', error)
     return null
   }
