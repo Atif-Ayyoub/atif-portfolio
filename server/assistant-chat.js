@@ -1,4 +1,5 @@
 const express = require('express')
+const { getKnowledgeReply, persistLearningCandidates } = require('./assistant-knowledge')
 
 const router = express.Router()
 
@@ -321,21 +322,35 @@ function buildReply(message, history = [], context = {}) {
   ].join('\n')
 }
 
-router.post('/chat', (req, res) => {
+router.post('/chat', async (req, res) => {
   try {
     const message = req.body?.message
     const history = Array.isArray(req.body?.history) ? req.body.history : []
     const context = req.body?.context && typeof req.body.context === 'object' ? req.body.context : {}
+    const sessionId = req.body?.sessionId || context.sessionId || null
+    const currentTopic = req.body?.currentTopic || context.currentTopic || null
 
     if (!message || typeof message !== 'string' || !message.trim()) {
       return res.status(400).json({ error: 'Message is required.' })
     }
 
-    const reply = buildReply(message, history, context)
+    const learningContext = { ...context, sessionId, currentTopic }
+    const knowledgeReply = await getKnowledgeReply({ message, context: learningContext, assistantProfile })
+    const reply = knowledgeReply || buildReply(message, history, learningContext)
+
+    await persistLearningCandidates({
+      message,
+      reply,
+      context: learningContext,
+      assistantProfile,
+    })
 
     return res.json({
       reply,
       assistant: assistantProfile,
+      learning: {
+        usedApprovedKnowledge: Boolean(knowledgeReply),
+      },
     })
   } catch (error) {
     console.error('assistant-chat route error:', error)

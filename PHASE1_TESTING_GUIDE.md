@@ -240,12 +240,14 @@ sports system
 ```
 
 **Expected:**
+
 - `wallpapr hub` should usually match Wallpaper Hub
 - `task app` should usually match Task Manager if confidence is high enough
 - `resize tool` and `sports system` should not force a wrong project if confidence is weak
 - `wp hub` should only auto-select if confidence clears the high/medium threshold
 
 **Console watch:**
+
 - `confidence`
 - `similarity`
 - `source`
@@ -264,10 +266,12 @@ User: "library"
 ```
 
 **Expected:**
+
 - If the match is below `0.70`, it must not auto-select a project
 - The bot should ask for clarification or return no match
 
 **Failure:**
+
 - Any low-confidence guess being accepted as a project
 
 ---
@@ -283,6 +287,7 @@ User: "tell me more"
 ```
 
 **Expected:**
+
 - The bot asks which project to continue with
 - It must not return a random project
 - It must not return the intro response
@@ -302,6 +307,7 @@ User: "tell me more"
 ```
 
 **Expected:**
+
 - The final follow-up should stay on `Task Manager`
 - The older project should not leak back in
 
@@ -320,6 +326,7 @@ User: "tell me more"
 ```
 
 **Expected:**
+
 - The bot should not jump back to Wallpaper Hub
 - It should ask what the user wants to continue with, or stay on services context
 
@@ -337,6 +344,7 @@ flutter app
 ```
 
 **Expected:**
+
 - `flutter app` should map to `Task Manager`
 - `resize project` should only map if the project truly exists in the portfolio data
 
@@ -353,6 +361,7 @@ User: "Which project uses Flutter and summarize it"
 ```
 
 **Expected:**
+
 - Detect the Flutter-related project
 - Treat the intent as summarize/follow-up
 - Answer directly without clarification if the project is clear
@@ -373,6 +382,7 @@ User: "what problem does it solve?"
 ```
 
 **Expected:**
+
 - All responses stay on Wallpaper Hub
 - No reset or generic intro
 
@@ -391,6 +401,7 @@ User: "what problem does it solve?"
 ```
 
 **Expected:**
+
 - The bot still knows the selected project
 - It returns the project features, not a generic answer
 
@@ -407,6 +418,7 @@ User: "summarize Netflix clone"
 ```
 
 **Expected:**
+
 - The bot responds: "That project is not in the portfolio."
 - It must not invent a project summary
 
@@ -433,7 +445,7 @@ The backend should enforce this rule before any fallback logic:
 
 ```js
 if (projectContext.selected && followUpIntent) {
-   return summarizeProject(projectContext.selected)
+  return summarizeProject(projectContext.selected);
 }
 ```
 

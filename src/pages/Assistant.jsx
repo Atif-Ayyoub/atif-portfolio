@@ -421,7 +421,7 @@ export default function Assistant() {
       const response = await fetch(FALLBACK_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history, context }),
+        body: JSON.stringify({ message: text, history, context, sessionId, currentTopic: intent }),
       })
 
       const data = await response.json().catch(() => null)

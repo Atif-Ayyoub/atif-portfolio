@@ -24,6 +24,12 @@ cp .env.example .env
 - `SUPABASE_SERVICE_ROLE_KEY` → Service Role Key (DO NOT expose)
 - `PORT` → server port (default 5000)
 
+The assistant learning layer also reads the same Supabase credentials so it can:
+
+- retrieve approved `learned_facts`
+- track `faq_patterns` frequency
+- store pending learning candidates safely
+
 4. Start server:
 
 ```bash
@@ -52,3 +58,12 @@ Response:
 ```
 
 Frontend (`News.jsx`) should call this endpoint before upserting news rows.
+
+## Assistant learning tables
+
+Run these migrations before enabling Phase 2 on the assistant route:
+
+- `supabase/migrations/012_learned_facts.sql`
+- `supabase/migrations/013_faq_patterns.sql`
+
+These tables are used for controlled learning only. Facts stay pending until you approve them in Supabase.
