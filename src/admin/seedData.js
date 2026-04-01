@@ -200,4 +200,120 @@ export const DEFAULT_PROJECTS = [
   },
 ]
 
+export const DEFAULT_BLOG_POSTS = [
+  {
+    id: 'blog-ai-tools-2026',
+    title: 'Best AI Tools for Developers in 2026',
+    slug: 'best-ai-tools-for-developers-2026',
+    excerpt: 'A practical breakdown of AI tools that help developers ship faster, write cleaner code, and automate repetitive work.',
+    content: `# Best AI Tools for Developers in 2026
+
+If you are evaluating AI tools for developers in 2026, focus on workflows that reduce time-to-ship and improve code quality.
+
+## Why AI tools matter
+
+AI tooling now supports planning, coding, testing, and documentation in one workflow. The goal is not to replace developers, but to remove repetitive tasks.
+
+## Top tools to use
+
+### ChatGPT
+
+Great for architecture brainstorming, API design drafts, and debugging strategy.
+
+### GitHub Copilot
+
+Strong in-editor assistance for repetitive patterns, refactors, and test scaffolding.
+
+### Cursor and editor copilots
+
+Useful for fast repository navigation and large refactors with contextual understanding.
+
+## Conclusion
+
+Build an AI-assisted workflow around your existing stack, and measure results weekly.` ,
+    coverImage: '/preview.png',
+    category: 'AI',
+    targetKeyword: 'AI tools for developers',
+    seoTitle: 'Best AI Tools for Developers in 2026 | Atif Ayyoub',
+    seoDescription: 'Discover the best AI tools for developers in 2026, including practical use-cases for coding, debugging, and faster product delivery.',
+    tags: ['AI', 'Developer Tools', 'Productivity'],
+    isPublished: true,
+    featured: true,
+    displayOrder: 1,
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'blog-scalable-web-apps',
+    title: 'How to Build Scalable Web Apps',
+    slug: 'how-to-build-scalable-web-apps',
+    excerpt: 'Architecture and delivery checklist for building scalable web apps with predictable performance.',
+    content: `# How to Build Scalable Web Apps
+
+Scalable web apps start with clear architecture decisions and consistent deployment practices.
+
+## Core architecture decisions
+
+Pick stable conventions for routing, data fetching, and state ownership before feature velocity increases.
+
+## Performance foundations
+
+Use route-level code splitting, image optimization, and caching to keep critical pages fast.
+
+## Delivery workflow
+
+Ship in small increments, monitor regressions, and keep rollback paths simple.
+
+## Conclusion
+
+Scalability is the result of repeated engineering discipline, not one-time optimization.` ,
+    coverImage: '/Atif1.png',
+    category: 'Web Dev',
+    targetKeyword: 'scalable web apps',
+    seoTitle: 'How to Build Scalable Web Apps | Atif Ayyoub',
+    seoDescription: 'Learn how to build scalable web apps with architecture planning, performance optimization, and reliable delivery practices.',
+    tags: ['Web Development', 'Architecture', 'Performance'],
+    isPublished: true,
+    featured: false,
+    displayOrder: 2,
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    id: 'blog-hire-web-developer-pakistan',
+    title: 'Hire Web Developer in Pakistan: 2026 Guide',
+    slug: 'hire-web-developer-pakistan',
+    excerpt: 'What to evaluate before hiring a web developer in Pakistan for your SaaS, startup, or business website.',
+    content: `# Hire Web Developer in Pakistan: 2026 Guide
+
+If you want to hire a web developer in Pakistan, evaluate communication, delivery quality, and stack alignment first.
+
+## What to evaluate before hiring
+
+Review shipped projects, code quality indicators, and how clearly requirements are handled.
+
+## Delivery model
+
+Define milestone-based delivery, weekly reporting, and acceptance criteria for each phase.
+
+## Conclusion
+
+Hiring success comes from process clarity as much as technical talent.` ,
+    coverImage: '/Atif.png',
+    category: 'Business',
+    targetKeyword: 'hire web developer Pakistan',
+    seoTitle: 'Hire Web Developer in Pakistan (2026) | Atif Ayyoub',
+    seoDescription: 'Practical guide to hire a web developer in Pakistan with quality checks, delivery model, and communication standards.',
+    tags: ['Freelancing', 'Hiring', 'Pakistan'],
+    isPublished: true,
+    featured: false,
+    displayOrder: 3,
+    publishedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+]
+
 export const DEFAULT_MESSAGES = []

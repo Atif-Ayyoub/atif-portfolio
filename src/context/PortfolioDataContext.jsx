@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  DEFAULT_BLOG_POSTS,
   DEFAULT_MESSAGES,
   DEFAULT_PROJECTS,
   DEFAULT_SERVICES,
@@ -14,6 +15,7 @@ const STORAGE_KEYS = {
   settings: 'portfolio_settings_v1',
   socialLinks: 'portfolio_social_links_v1',
   messages: 'portfolio_messages_v1',
+  blogs: 'portfolio_blogs_v1',
 }
 
 const PortfolioDataContext = createContext(null)
@@ -42,18 +44,30 @@ function getId(prefix = 'item') {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
 export function PortfolioDataProvider({ children }) {
   const [services, setServices] = useState(() => parseStoredValue(STORAGE_KEYS.services, DEFAULT_SERVICES))
   const [projects, setProjects] = useState(() => parseStoredValue(STORAGE_KEYS.projects, DEFAULT_PROJECTS))
   const [settings, setSettings] = useState(() => parseStoredValue(STORAGE_KEYS.settings, DEFAULT_SETTINGS))
   const [socialLinks, setSocialLinks] = useState(() => parseStoredValue(STORAGE_KEYS.socialLinks, DEFAULT_SOCIAL_LINKS))
   const [messages, setMessages] = useState(() => parseStoredValue(STORAGE_KEYS.messages, DEFAULT_MESSAGES))
+  const [blogs, setBlogs] = useState(() => parseStoredValue(STORAGE_KEYS.blogs, DEFAULT_BLOG_POSTS))
   const hasSupabase = Boolean(supabase && typeof supabase.from === 'function')
   const servicesRef = useRef(services)
   const projectsRef = useRef(projects)
   const settingsRef = useRef(settings)
   const socialLinksRef = useRef(socialLinks)
   const messagesRef = useRef(messages)
+  const blogsRef = useRef(blogs)
 
   useEffect(() => {
     servicesRef.current = services
@@ -74,6 +88,10 @@ export function PortfolioDataProvider({ children }) {
   useEffect(() => {
     messagesRef.current = messages
   }, [messages])
+
+  useEffect(() => {
+    blogsRef.current = blogs
+  }, [blogs])
 
   const persist = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value))
@@ -196,6 +214,46 @@ export function PortfolioDataProvider({ children }) {
     displayOrder: toNumber(row.display_order, 0),
   })
 
+  const mapAppBlogToDb = (item) => ({
+    id: item.id,
+    title: item.title,
+    slug: item.slug,
+    excerpt: item.excerpt,
+    content: item.content,
+    cover_image: item.coverImage,
+    category: item.category,
+    target_keyword: item.targetKeyword,
+    seo_title: item.seoTitle,
+    seo_description: item.seoDescription,
+    tags: Array.isArray(item.tags) ? item.tags : [],
+    is_published: Boolean(item.isPublished),
+    featured: Boolean(item.featured),
+    display_order: toNumber(item.displayOrder, 0),
+    published_at: item.publishedAt,
+    created_at: item.createdAt || new Date().toISOString(),
+    updated_at: item.updatedAt || new Date().toISOString(),
+  })
+
+  const mapDbBlogToApp = (row) => ({
+    id: row.id,
+    title: sanitizeText(row.title),
+    slug: sanitizeText(row.slug),
+    excerpt: sanitizeText(row.excerpt),
+    content: String(row.content || ''),
+    coverImage: sanitizeText(row.cover_image),
+    category: sanitizeText(row.category),
+    targetKeyword: sanitizeText(row.target_keyword),
+    seoTitle: sanitizeText(row.seo_title),
+    seoDescription: sanitizeText(row.seo_description),
+    tags: Array.isArray(row.tags) ? row.tags.map((tag) => sanitizeText(tag)).filter(Boolean) : [],
+    isPublished: Boolean(row.is_published),
+    featured: Boolean(row.featured),
+    displayOrder: toNumber(row.display_order, 0),
+    publishedAt: row.published_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  })
+
   const refreshMessages = useCallback(async () => {
     if (!hasSupabase) return
 
@@ -217,7 +275,7 @@ export function PortfolioDataProvider({ children }) {
     let isCancelled = false
 
     async function loadPersistentData() {
-      const [settingsResult, messagesResult, servicesResult, projectsResult, socialLinksResult] = await Promise.all([
+      const [settingsResult, messagesResult, servicesResult, projectsResult, socialLinksResult, blogsResult] = await Promise.all([
         supabase.from('app_settings').select('data').eq('id', 1).maybeSingle(),
         supabase
           .from('contact_messages')
@@ -234,6 +292,10 @@ export function PortfolioDataProvider({ children }) {
         supabase
           .from('social_links')
           .select('id, platform, url, icon, is_active, display_order, created_at, updated_at')
+          .order('display_order', { ascending: true }),
+        supabase
+          .from('blog_posts')
+          .select('id, title, slug, excerpt, content, cover_image, category, target_keyword, seo_title, seo_description, tags, is_published, featured, display_order, published_at, created_at, updated_at')
           .order('display_order', { ascending: true }),
       ])
 
@@ -312,6 +374,19 @@ export function PortfolioDataProvider({ children }) {
         } else if (socialLinksRef.current.length > 0) {
           await supabase.from('social_links').upsert(
             socialLinksRef.current.map(mapAppSocialLinkToDb),
+            { onConflict: 'id' },
+          )
+        }
+      }
+
+      if (!blogsResult.error && Array.isArray(blogsResult.data)) {
+        if (blogsResult.data.length > 0) {
+          const mappedBlogs = blogsResult.data.map(mapDbBlogToApp)
+          setBlogs(mappedBlogs)
+          persist(STORAGE_KEYS.blogs, mappedBlogs)
+        } else if (blogsRef.current.length > 0) {
+          await supabase.from('blog_posts').upsert(
+            blogsRef.current.map(mapAppBlogToDb),
             { onConflict: 'id' },
           )
         }
@@ -577,17 +652,77 @@ export function PortfolioDataProvider({ children }) {
     })
   }
 
+  const upsertBlog = async (blog, id) => {
+    const now = new Date().toISOString()
+    const cleaned = {
+      id: id || getId('blog'),
+      title: sanitizeText(blog.title),
+      slug: sanitizeText(blog.slug) || slugify(blog.title),
+      excerpt: sanitizeText(blog.excerpt),
+      content: String(blog.content || '').trim(),
+      coverImage: sanitizeText(blog.coverImage),
+      category: sanitizeText(blog.category),
+      targetKeyword: sanitizeText(blog.targetKeyword),
+      seoTitle: sanitizeText(blog.seoTitle) || sanitizeText(blog.title),
+      seoDescription: sanitizeText(blog.seoDescription) || sanitizeText(blog.excerpt),
+      tags: Array.isArray(blog.tags)
+        ? blog.tags.map((tag) => sanitizeText(tag)).filter(Boolean)
+        : String(blog.tags || '')
+            .split(',')
+            .map((tag) => sanitizeText(tag))
+            .filter(Boolean),
+      isPublished: Boolean(blog.isPublished),
+      featured: Boolean(blog.featured),
+      displayOrder: toNumber(blog.displayOrder, 0),
+      publishedAt: blog.publishedAt || now,
+      createdAt: id ? blog.createdAt || now : now,
+      updatedAt: now,
+    }
+
+    if (hasSupabase) {
+      const { error } = await supabase
+        .from('blog_posts')
+        .upsert(mapAppBlogToDb(cleaned), { onConflict: 'id' })
+      if (error) throw error
+    }
+
+    setBlogs((prev) => {
+      const next = id
+        ? prev.map((item) => (item.id === id ? { ...item, ...cleaned } : item))
+        : [...prev, cleaned]
+      persist(STORAGE_KEYS.blogs, next)
+      return next
+    })
+
+    return cleaned
+  }
+
+  const deleteBlog = async (id) => {
+    if (hasSupabase) {
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id)
+      if (error) throw error
+    }
+
+    setBlogs((prev) => {
+      const next = prev.filter((item) => item.id !== id)
+      persist(STORAGE_KEYS.blogs, next)
+      return next
+    })
+  }
+
   const resetAllData = () => {
     setServices(DEFAULT_SERVICES)
     setProjects(DEFAULT_PROJECTS)
     setSettings(DEFAULT_SETTINGS)
     setSocialLinks(DEFAULT_SOCIAL_LINKS)
     setMessages(DEFAULT_MESSAGES)
+    setBlogs(DEFAULT_BLOG_POSTS)
     persist(STORAGE_KEYS.services, DEFAULT_SERVICES)
     persist(STORAGE_KEYS.projects, DEFAULT_PROJECTS)
     persist(STORAGE_KEYS.settings, DEFAULT_SETTINGS)
     persist(STORAGE_KEYS.socialLinks, DEFAULT_SOCIAL_LINKS)
     persist(STORAGE_KEYS.messages, DEFAULT_MESSAGES)
+    persist(STORAGE_KEYS.blogs, DEFAULT_BLOG_POSTS)
   }
 
   const sortedServices = useMemo(
@@ -609,6 +744,21 @@ export function PortfolioDataProvider({ children }) {
     [socialLinks],
   )
 
+  const sortedBlogs = useMemo(
+    () =>
+      [...blogs].sort((a, b) => {
+        if (a.featured !== b.featured) return a.featured ? -1 : 1
+        if (Number(a.displayOrder) !== Number(b.displayOrder)) return Number(a.displayOrder) - Number(b.displayOrder)
+        return new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0)
+      }),
+    [blogs],
+  )
+
+  const publishedBlogs = useMemo(
+    () => sortedBlogs.filter((post) => post.isPublished),
+    [sortedBlogs],
+  )
+
   const value = useMemo(
     () => ({
       services,
@@ -616,13 +766,18 @@ export function PortfolioDataProvider({ children }) {
       settings,
       socialLinks,
       messages,
+      blogs,
       sortedServices,
       sortedProjects,
       sortedSocialLinks,
+      sortedBlogs,
+      publishedBlogs,
       upsertService,
       deleteService,
       upsertProject,
       deleteProject,
+      upsertBlog,
+      deleteBlog,
       updateSettings,
       upsertSocialLink,
       deleteSocialLink,
@@ -634,20 +789,25 @@ export function PortfolioDataProvider({ children }) {
     }),
     [
       deleteMessage,
+      deleteBlog,
       deleteProject,
       deleteService,
       deleteSocialLink,
+      blogs,
       messages,
+      publishedBlogs,
       projects,
       refreshMessages,
       services,
       settings,
       socialLinks,
+      sortedBlogs,
       sortedProjects,
       sortedServices,
       sortedSocialLinks,
       updateMessageStatus,
       updateSettings,
+      upsertBlog,
       upsertProject,
       upsertService,
       upsertSocialLink,

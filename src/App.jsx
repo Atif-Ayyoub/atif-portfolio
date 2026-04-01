@@ -11,6 +11,8 @@ const Home = React.lazy(() => import('./pages/Home'))
 const About = React.lazy(() => import('./pages/About'))
 const Services = React.lazy(() => import('./pages/Services'))
 const Projects = React.lazy(() => import('./pages/Projects'))
+const Blog = React.lazy(() => import('./pages/Blog'))
+const BlogPost = React.lazy(() => import('./pages/BlogPost'))
 const News = React.lazy(() => import('./pages/News'))
 const Contact = React.lazy(() => import('./pages/Contact'))
 const NotFound = React.lazy(() => import('./pages/NotFound'))
@@ -19,6 +21,7 @@ const AdminLoginPage = React.lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboardPage = React.lazy(() => import('./pages/admin/AdminDashboardPage'))
 const AdminServicesPage = React.lazy(() => import('./pages/admin/AdminServicesPage'))
 const AdminProjectsPage = React.lazy(() => import('./pages/admin/AdminProjectsPage'))
+const AdminBlogPage = React.lazy(() => import('./pages/admin/AdminBlogPage'))
 const AdminMessagesPage = React.lazy(() => import('./pages/admin/AdminMessagesPage'))
 const AdminSettingsPage = React.lazy(() => import('./pages/admin/AdminSettingsPage'))
 const AdminSocialLinksPage = React.lazy(() => import('./pages/admin/AdminSocialLinksPage'))
@@ -33,6 +36,7 @@ export default function App(){
     if (location.pathname.startsWith('/about')) return 'about'
     if (location.pathname.startsWith('/services')) return 'services'
     if (location.pathname.startsWith('/projects')) return 'projects'
+    if (location.pathname.startsWith('/blog')) return 'blog'
     if (location.pathname.startsWith('/news')) return 'news'
     if (location.pathname.startsWith('/contact')) return 'contact'
     return 'home'
@@ -44,6 +48,7 @@ export default function App(){
       about: '/about',
       services: '/services',
       projects: '/projects',
+      blog: '/blog',
       news: '/news',
       contact: '/contact',
       admin: '/admin/login'
@@ -80,6 +85,14 @@ export default function App(){
               element={
                 <ProtectedRoute>
                   <AdminProjectsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/blog"
+              element={
+                <ProtectedRoute>
+                  <AdminBlogPage />
                 </ProtectedRoute>
               }
             />
@@ -124,6 +137,8 @@ export default function App(){
                   <Route path="/about" element={<About />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/projects" element={<Projects />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/news" element={<News />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="*" element={<NotFound />} />

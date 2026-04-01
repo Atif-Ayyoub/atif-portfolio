@@ -17,12 +17,32 @@
   </url>
 
   <url>
+    <loc>https://atif-portfolio-nine.vercel.app/blog</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://atif-portfolio-nine.vercel.app/services</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://atif-portfolio-nine.vercel.app/contact</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://atif-portfolio-nine.vercel.app/blog/best-ai-tools-for-developers-2026</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://atif-portfolio-nine.vercel.app/blog/how-to-build-scalable-web-apps</loc>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://atif-portfolio-nine.vercel.app/blog/hire-web-developer-pakistan</loc>
     <priority>0.7</priority>
   </url>
 

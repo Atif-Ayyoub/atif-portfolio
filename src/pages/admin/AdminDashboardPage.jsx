@@ -13,9 +13,10 @@ function StatCard({ label, value }) {
 }
 
 export default function AdminDashboardPage() {
-  const { services, projects, socialLinks, messages } = usePortfolioData()
+  const { services, projects, socialLinks, messages, blogs } = usePortfolioData()
   const recentServices = [...services].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 4)
   const recentProjects = [...projects].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 4)
+  const recentBlogs = [...blogs].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)).slice(0, 4)
   const recentMessages = [...messages].sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)).slice(0, 5)
 
   return (
@@ -26,12 +27,14 @@ export default function AdminDashboardPage() {
         <>
           <Link className="admin-action-btn admin-action-btn-primary" to="/admin/services">Add Service</Link>
           <Link className="admin-action-btn admin-action-btn-secondary" to="/admin/projects">Add Project</Link>
+          <Link className="admin-action-btn admin-action-btn-secondary" to="/admin/blog">Add Blog Post</Link>
         </>
       }
     >
       <div className="dashboard-stats-grid">
         <StatCard label="Total Services" value={services.length} />
         <StatCard label="Total Projects" value={projects.length} />
+        <StatCard label="Blog Posts" value={blogs.length} />
         <StatCard label="Social Links" value={socialLinks.length} />
         <StatCard label="Contact Messages" value={messages.length} />
       </div>
@@ -64,6 +67,19 @@ export default function AdminDashboardPage() {
         </section>
 
         <section className="dashboard-section-card">
+          <h3 className="dashboard-section-title">Recent Blog Posts</h3>
+          <div>
+            {recentBlogs.length === 0 ? <p className="dashboard-empty-state">No blog posts yet</p> : null}
+            {recentBlogs.map((item) => (
+              <div key={item.id} className="dashboard-list-item">
+                <p className="dashboard-list-item-title">{item.title}</p>
+                <p className="dashboard-list-item-subtitle">{item.category || 'General'} · {item.isPublished ? 'Published' : 'Draft'}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="dashboard-section-card">
           <h3 className="dashboard-section-title">Recent Messages</h3>
           <div>
             {recentMessages.length === 0 ? <p className="dashboard-empty-state dashboard-empty-state-centered">No messages yet</p> : null}
@@ -80,6 +96,7 @@ export default function AdminDashboardPage() {
       <div className="dashboard-quick-actions-grid">
         <Link className="dashboard-quick-action-link" to="/admin/services">Add Service</Link>
         <Link className="dashboard-quick-action-link" to="/admin/projects">Add Project</Link>
+        <Link className="dashboard-quick-action-link" to="/admin/blog">Manage Blog</Link>
         <Link className="dashboard-quick-action-link" to="/admin/messages">View Messages</Link>
         <Link className="dashboard-quick-action-link" to="/admin/settings">Update Portfolio</Link>
       </div>
