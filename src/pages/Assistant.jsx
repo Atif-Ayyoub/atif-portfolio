@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { FaArrowUp, FaBolt, FaCircleCheck, FaCopy, FaMicrophone, FaRobot, FaStar, FaUser, FaWandMagicSparkles } from 'react-icons/fa6'
 import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
+import { getOrCreateSessionId, loadSession, upsertSession, saveConversation, detectIntent, extractEntities } from '../lib/sessionMemory'
+import { detectProjectInText } from '../lib/fuzzyMatch'
 import './assistant.css'
 
 const STORAGE_KEY = 'portfolio-assistant-chat-v1'
@@ -25,7 +27,20 @@ function uniqueValues(values) {
   return [...new Set(values.filter(Boolean))]
 }
 
+function normalizeText(value) {
+  return String(value || '').toLowerCase().trim()
+}
+
 function buildKnowledgeSnapshot({ settings, services, projects, blogs }) {
+  const projectList = projects.slice(0, 8).map((project) => ({
+    title: project.title,
+    summary: project.shortDescription || project.description || '',
+    description: project.description || project.shortDescription || '',
+    tech: project.technologies || [],
+    status: project.status || 'Completed',
+    role: project.role || '',
+  }))
+
   const techSet = uniqueValues([
     'React',
     'Node.js',
@@ -36,7 +51,7 @@ function buildKnowledgeSnapshot({ settings, services, projects, blogs }) {
     'PHP',
     'MySQL',
     'Supabase',
-    ...projects.flatMap((project) => project.technologies || []),
+    ...projectList.flatMap((project) => project.tech || []),
     ...services.map((service) => service.title),
   ])
 
@@ -47,73 +62,165 @@ function buildKnowledgeSnapshot({ settings, services, projects, blogs }) {
     email: settings.email || 'atifayyoub82@gmail.com',
     phone: settings.phone || '',
     website: settings.website || '',
-    services: services.slice(0, 5).map((service) => service.title || service.shortDescription).filter(Boolean),
-    projects: projects.slice(0, 4).map((project) => ({
-      title: project.title,
-      description: project.shortDescription || project.description || '',
-      tech: project.technologies || [],
-    })),
+    services: services.slice(0, 6).map((service) => service.title || service.shortDescription).filter(Boolean),
+    projects: projectList,
     blogs: blogs.slice(0, 3).map((post) => post.title).filter(Boolean),
     tech: techSet,
     serviceCount: services.length,
     projectCount: projects.length,
     blogCount: blogs.length,
+    faq: [
+      {
+        question: 'What services do you offer?',
+        answer: 'Atif offers AI web app development, custom software solutions, Laravel development, Flutter apps, portfolio websites, and business dashboards.',
+      },
+      {
+        question: 'Are you available for freelance work?',
+        answer: 'Yes, Atif is available for freelance and custom software projects depending on scope and timeline.',
+      },
+    ],
   }
 }
 
-function composeReply(question, snapshot) {
-  const text = normalize(question)
+function formatBullets(items) {
+  return items.map((item) => `- ${item}`).join('\n')
+}
 
-  const intro = `${snapshot.name} is a ${snapshot.title} based in Pakistan, focused on practical AI, scalable web apps, and polished digital products.`
+function listProjectNames(snapshot) {
+  return snapshot.projects.map((project) => project.title)
+}
 
-  if (!text) return 'Ask me about services, projects, skills, or how to hire Atif.'
+function findProjectMatches(text, snapshot) {
+  const query = normalizeText(text)
+  return snapshot.projects.filter((project) => query.includes(normalizeText(project.title)))
+}
+
+function collectRecentProjectMentions(messages, snapshot) {
+  const mentions = []
+  for (const message of [...messages].reverse()) {
+    const messageText = normalizeText(message?.text || message?.content)
+    if (!messageText) continue
+    for (const project of snapshot.projects) {
+      if (messageText.includes(normalizeText(project.title))) {
+        mentions.push(project.title)
+      }
+    }
+  }
+  return uniqueValues(mentions)
+}
+
+function resolveProjectContext(question, messages, snapshot) {
+  const direct = findProjectMatches(question, snapshot)
+  if (direct.length === 1) return { selected: direct[0], candidates: [] }
+  if (direct.length > 1) return { selected: null, candidates: direct.map((project) => project.title) }
+
+  const recent = collectRecentProjectMentions(messages, snapshot)
+  if (recent.length === 1) {
+    return { selected: snapshot.projects.find((project) => project.title === recent[0]) || null, candidates: [] }
+  }
+  if (recent.length > 1) return { selected: null, candidates: recent }
+
+  return { selected: null, candidates: [] }
+}
+
+function summarizeProject(project) {
+  return [
+    `Quick answer: ${project.title} is ${project.summary}.`,
+    '',
+    'Details:',
+    `- Problem: ${project.description || project.summary}`,
+    `- Tech stack: ${project.tech.join(', ') || 'Not listed yet'}`,
+    `- Role: ${project.role || 'Developer'}`,
+    `- Status: ${project.status || 'Completed'}`,
+    '',
+    `Next step: I can also explain the features, tech stack, or development approach for ${project.title}.`,
+  ].join('\n')
+}
+
+function buildStructuredReply(title, details, nextStep) {
+  return [
+    `Quick answer: ${title}`,
+    '',
+    'Details:',
+    ...details.map((line) => `- ${line}`),
+    '',
+    `Next step: ${nextStep}`,
+  ].join('\n')
+}
+
+function buildFallbackResponse(question, snapshot, messages = []) {
+  const text = normalizeText(question)
+  if (!text) return 'Ask me about projects, services, skills, hiring, or blog topics.'
+
+  const followUpIntent = /\b(summarize|summary|explain|tell me more|what is it|what does it do|how was it built|what tech was used|what problem does it solve)\b/.test(text) || /\b(it|that project|this project)\b/.test(text)
 
   if (/\b(hi|hello|hey|good morning|good evening)\b/.test(text)) {
-    return `Quick answer: I can help you explore ${snapshot.name}'s work, services, and contact details.\n\nTry asking about projects, skills, services, or hiring.`
+    return buildStructuredReply(`I can help you explore ${snapshot.name}'s portfolio, services, and contact details.`, [
+      'Ask about projects, skills, services, or hiring for a focused answer.',
+    ], 'Try asking about a specific project or service.')
   }
 
   if (/\b(who are you|who is atif|about atif|tell me about atif|introduce yourself)\b/.test(text)) {
-    return `${intro}\n\nHe builds portfolio sites, AI-enabled web apps, APIs, and production-focused interfaces with a strong emphasis on UX, SEO, and clean delivery.`
+    return buildStructuredReply(`${snapshot.name} is a ${snapshot.title} based in Pakistan.`, [
+      'He focuses on practical AI, scalable web apps, and polished digital products.',
+      `Core services: ${snapshot.services.slice(0, 4).join(', ')}.`,
+    ], 'Ask about projects, skills, or hiring details.')
+  }
+
+  const projectContext = resolveProjectContext(question, messages, snapshot)
+  if (followUpIntent) {
+    if (projectContext.selected) return summarizeProject(projectContext.selected)
+    if (projectContext.candidates.length > 1) {
+      return `Which project would you like me to summarize: ${projectContext.candidates.join(', ')}?`
+    }
+    return `I can summarize a project, but I need the project name first. Available projects: ${listProjectNames(snapshot).join(', ')}.`
   }
 
   if (/\b(projects?|case studies|built|portfolio)\b/.test(text)) {
-    const projectsText = snapshot.projects.length
-      ? snapshot.projects
-          .map((project) => `- ${project.title}: ${project.description}`)
-          .join('\n')
-      : '- No projects available right now.'
-    return `Quick answer: Atif has built ${snapshot.projectCount} portfolio projects.\n\nFeatured work:\n${projectsText}\n\nIf you want, I can also summarize one project in detail.`
+    const projectLines = snapshot.projects.length
+      ? snapshot.projects.map((project) => `${project.title}: ${project.summary}`)
+      : ['No projects available right now.']
+    return buildStructuredReply(`Atif has built ${snapshot.projectCount} portfolio projects.`, projectLines, 'I can summarize any one of these projects in more detail.')
   }
 
-  if (/\b(services?|offer|do you provide|hire)\b/.test(text)) {
-    const servicesText = snapshot.services.length
-      ? snapshot.services.map((service) => `- ${service}`).join('\n')
-      : '- No services listed right now.'
-    return `Quick answer: Atif offers ${snapshot.serviceCount} core services.\n\nServices:\n${servicesText}\n\nFor hiring, use the contact page or share your scope, timeline, and budget.`
+  if (/\b(services?|offer|do you provide|hire|provide)\b/.test(text)) {
+    const serviceLines = snapshot.services.length ? snapshot.services : ['No services listed right now.']
+    return buildStructuredReply(`Atif offers ${snapshot.serviceCount} core services.`, serviceLines, `Share your scope, timeline, and budget, or email ${snapshot.email}.`)
   }
 
   if (/\b(skills?|stack|technologies?|tech|tools)\b/.test(text)) {
-    return `Quick answer: Atif works with ${snapshot.tech.slice(0, 10).join(', ')} and more.\n\nHe focuses on React, Node.js, AI integrations, backend systems, mobile app development, and SEO-friendly content experiences.`
+    return buildStructuredReply(`Atif works with ${snapshot.tech.slice(0, 10).join(', ')} and related tooling.`, [
+      'He focuses on React, Node.js, AI integrations, backend systems, mobile app development, and SEO-friendly content experiences.',
+    ], 'Ask me which project uses a specific technology.')
   }
 
   if (/\b(contact|email|reach|message|phone|linkedin|github)\b/.test(text)) {
-    return `Quick answer: The fastest way to reach Atif is via email at ${snapshot.email}.\n\nYou can also use the contact form on the site to send your project scope, timeline, and goals.`
+    return buildStructuredReply(`The best direct contact is ${snapshot.email}.`, [
+      'You can also use the contact form on the site for project inquiries.',
+      'Share your scope, timeline, and goals for a faster reply.',
+    ], 'I can also help summarize a project or explain services.')
   }
 
   if (/\b(blog|content|seo|articles|post)\b/.test(text)) {
-    const blogList = snapshot.blogs.length ? snapshot.blogs.map((title) => `- ${title}`).join('\n') : '- No blog posts listed yet.'
-    return `Quick answer: The blog focuses on SEO, AI, React, and scalable web delivery.\n\nRecent posts:\n${blogList}\n\nI can also turn any post into a short snippet-style answer.`
+    const blogLines = snapshot.blogs.length ? snapshot.blogs : ['No blog posts listed yet.']
+    return buildStructuredReply('The blog focuses on SEO, AI, React, and scalable web delivery.', blogLines, 'I can also turn any post into a short snippet-style answer.')
   }
 
   if (/\b(ai|artificial intelligence|llm|openai|automation|chatbot)\b/.test(text)) {
-    return `Quick answer: Atif builds practical AI features for websites and product workflows.\n\nThat includes chat assistants, content workflows, automation, and AI-enabled user experiences that stay fast and maintainable.`
+    return buildStructuredReply('Atif builds practical AI features for websites and product workflows.', [
+      'That includes chat assistants, content workflows, automation, and AI-enabled user experiences.',
+    ], 'Ask which project or service uses AI.')
   }
 
-  return `Quick answer: ${intro}\n\nI can help with services, projects, skills, blog content, or hiring details. Try one of the suggested questions below for a focused answer.`
-}
+  const faqMatch = snapshot.faq.find((item) => normalizeText(text).includes(normalizeText(item.question)))
+  if (faqMatch) {
+    return buildStructuredReply(faqMatch.answer, [], 'I can also help with a project summary or hiring question.')
+  }
 
-function buildFallbackResponse(question, snapshot) {
-  return composeReply(question, snapshot)
+  return buildStructuredReply(`${snapshot.name} is a ${snapshot.title}.`, [
+    'I can answer questions about projects, services, skills, hiring, and contact info.',
+    'If you mention a specific project, I can summarize it.',
+  ], 'Try asking about a project by name or say “summarize it” after selecting one.')
 }
 
 function MessageBubble({ message }) {
@@ -150,7 +257,27 @@ export default function Assistant() {
   const [isLoading, setIsLoading] = useState(false)
   const [status, setStatus] = useState('Ready')
   const [copied, setCopied] = useState('')
+  const [selectedProject, setSelectedProject] = useState(null)
+  const [sessionId, setSessionId] = useState(null)
+  const [currentTopic, setCurrentTopic] = useState('general')
   const messagesEndRef = useRef(null)
+
+  // Initialize session on component mount
+  useEffect(() => {
+    const initSession = async () => {
+      const id = getOrCreateSessionId()
+      setSessionId(id)
+
+      // Load existing session state
+      const existingSession = await loadSession(id)
+      if (existingSession) {
+        setSelectedProject(existingSession.selected_project)
+        setCurrentTopic(existingSession.current_topic || 'general')
+      }
+    }
+
+    initSession()
+  }, [])
 
   useEffect(() => {
     try {
@@ -184,9 +311,19 @@ export default function Assistant() {
     return () => window.clearTimeout(timer)
   }, [copied])
 
+  const detectAndSetProject = (userText) => {
+    // Use fuzzy matching with typo tolerance
+    const detected = detectProjectInText(userText, snapshot.projects)
+    if (detected) {
+      setSelectedProject(detected)
+      return detected
+    }
+    return null
+  }
+
   const sendMessage = async (prompt = input) => {
     const text = String(prompt || '').trim()
-    if (!text || isLoading) return
+    if (!text || isLoading || !sessionId) return
 
     const userMessage = { role: 'user', text }
     const nextMessages = [...messages, userMessage]
@@ -195,27 +332,93 @@ export default function Assistant() {
     setIsLoading(true)
     setStatus('Thinking')
 
+    // Detect intent and entities
+    const intent = detectIntent(text)
+    const entities = extractEntities(text, snapshot)
+
+    // Detect if user mentioned a project with typo tolerance and update state
+    const detectedProject = detectAndSetProject(text)
+    if (detectedProject) {
+      setSelectedProject(detectedProject)
+    }
+    const activeProject = detectedProject || selectedProject
+
+    // Update topic based on intent
+    if (intent !== 'general') {
+      setCurrentTopic(intent)
+    }
+
     const history = nextMessages.slice(0, -1).map((message) => ({
       role: message.role,
       content: message.text,
     }))
 
+    const context = {
+      selectedProject: activeProject,
+      recentProjects: uniqueValues(
+        [...nextMessages].reverse().flatMap((message) =>
+          snapshot.projects
+            .filter((project) => normalizeText(message.text).includes(normalizeText(project.title)))
+            .map((project) => project.title),
+        ),
+      ),
+      lastMessage: nextMessages[nextMessages.length - 2]?.text || '',
+    }
+
+    console.log('📤 User Message:', text)
+    console.log('🎯 Detected Project:', detectedProject)
+    console.log('🎯 Selected Project:', activeProject)
+    console.log('📍 Intent:', intent)
+    console.log('📍 Context:', context)
+
     try {
       const response = await fetch(FALLBACK_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history }),
+        body: JSON.stringify({ message: text, history, context }),
       })
 
       const data = await response.json().catch(() => null)
-      const reply = response.ok && data?.reply ? data.reply : buildFallbackResponse(text, snapshot)
+      const reply = response.ok && data?.reply ? data.reply : buildFallbackResponse(text, snapshot, history)
+
+      console.log('✅ Reply:', reply)
 
       setMessages((prev) => [...prev, { role: 'assistant', text: reply }])
       setStatus('Ready')
-    } catch {
-      const fallback = buildFallbackResponse(text, snapshot)
+
+      // Save to Supabase (fire and forget, don't block)
+      saveConversation(sessionId, {
+        user_message: text,
+        bot_reply: reply,
+        current_topic: intent,
+        selected_project: activeProject,
+        last_intent: intent,
+        last_entities: entities,
+      }).catch((err) => console.error('Failed to save conversation:', err))
+
+      // Update session state
+      upsertSession(sessionId, {
+        current_topic: intent,
+        selected_project: activeProject,
+        last_intent: intent,
+        context: { lastProject: activeProject, lastTopic: intent },
+        message_count: nextMessages.length,
+      }).catch((err) => console.error('Failed to update session:', err))
+    } catch (error) {
+      console.error('❌ Fetch error:', error)
+      const fallback = buildFallbackResponse(text, snapshot, history)
       setMessages((prev) => [...prev, { role: 'assistant', text: fallback }])
       setStatus('Offline fallback')
+
+      // Still save fallback response
+      saveConversation(sessionId, {
+        user_message: text,
+        bot_reply: fallback,
+        current_topic: intent,
+        selected_project: activeProject,
+        last_intent: intent,
+        last_entities: entities,
+      }).catch((err) => console.error('Failed to save conversation:', err))
     } finally {
       setIsLoading(false)
     }
