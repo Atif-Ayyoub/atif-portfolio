@@ -32,8 +32,24 @@ function compact(value) {
   return normalizeText(value).replace(/\s+/g, '')
 }
 
+function sourceWeight(source) {
+  if (source === 'manual') return 3
+  if (source === 'system') return 2
+  return 1
+}
+
+function normalizeFactValue(value) {
+  const values = Array.isArray(value) ? value : [value]
+  return unique(
+    values
+      .map((item) => normalizeText(item))
+      .filter(Boolean)
+      .sort(),
+  )
+}
+
 function stringifyValue(value) {
-  if (Array.isArray(value)) return value.join('|')
+  if (Array.isArray(value)) return normalizeFactValue(value).join('|')
   if (value && typeof value === 'object') return JSON.stringify(value)
   return String(value || '')
 }
@@ -104,6 +120,54 @@ function extractValueList(message) {
     .filter(Boolean)
 }
 
+function extractFeatureValue(message, entityName) {
+  const text = String(message || '').trim()
+  const entityPattern = entityName ? escapeRegExp(entityName) : ''
+
+  const patterns = [
+    new RegExp(`(?:now\s+supports?|supports?|now\s+includes?|includes?|added|adds|has\s+added|I\s+recently\s+added)\s+(.+?)(?:\s+(?:to|for|in|on)\s+${entityPattern}|[\.!?]|$)`, 'i'),
+    new RegExp(`(?:features?|feature)\s*:?\s*(.+?)(?:\s+(?:to|for|in|on)\s+${entityPattern}|[\.!?]|$)`, 'i'),
+  ]
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match && match[1]) {
+      const value = match[1].trim().replace(/\s+(?:to|for|in|on)\s+$/i, '').trim()
+      if (value) return extractValueList(value)
+    }
+  }
+
+  return extractValueList(message)
+}
+
+function extractTechStackValue(message, entityName) {
+  const text = String(message || '').trim()
+  const entityPattern = entityName ? escapeRegExp(entityName) : ''
+  const patterns = [
+    new RegExp(`(?:now\s+uses?|uses?|built\s+with|tech\s+stack|stack)\s+(.+?)(?:\s+(?:to|for|in|on)\s+${entityPattern}|[\.!?]|$)`, 'i'),
+    new RegExp(`(?:uses?|built\s+with)\s+(.+?)(?:[\.!?]|$)`, 'i'),
+  ]
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match && match[1]) {
+      const value = match[1].trim().replace(/\s+(?:to|for|in|on)\s+$/i, '').trim()
+      if (value) return extractValueList(value)
+    }
+  }
+
+  return extractValueList(message)
+}
+
+function extractStatusValue(message) {
+  const statusMatch = String(message || '').match(/\b(completed|in progress|done|launched|live|released)\b/i)
+  return statusMatch ? [statusMatch[1].toLowerCase()] : []
+}
+
+function escapeRegExp(value) {
+  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function detectLearningCandidates({ message, reply, context = {}, assistantProfile, approvedFacts = [] }) {
   const candidates = []
   const lower = normalizeText(message)
@@ -118,7 +182,7 @@ function detectLearningCandidates({ message, reply, context = {}, assistantProfi
   }
 
   if (entityName && /\b(no,?\s*it uses|actually it uses|it uses|no it is|actually it is)\b/i.test(message)) {
-    const values = extractValueList(message)
+    const values = extractTechStackValue(message, entityName)
     if (values.length) {
       candidates.push({
         fact_type: 'correction',
@@ -128,13 +192,13 @@ function detectLearningCandidates({ message, reply, context = {}, assistantProfi
         confidence: 0.95,
         source: 'conversation',
         status: 'pending',
-        metadata: { ...baseMetadata, detected_rule: 'correction-tech-stack' },
+        metadata: { ...baseMetadata, detected_rule: 'correction-tech-stack', traceability: { source: 'learned_fact', confidence: 0.95 } },
       })
     }
   }
 
   if (entityName && /\b(now supports?|supports?|now includes?|includes?|added|adds|has added|feature)\b/i.test(message)) {
-    const values = extractValueList(message)
+    const values = extractFeatureValue(message, entityName)
     if (values.length) {
       candidates.push({
         fact_type: 'project_update',
@@ -144,13 +208,13 @@ function detectLearningCandidates({ message, reply, context = {}, assistantProfi
         confidence: 0.9,
         source: 'conversation',
         status: 'pending',
-        metadata: { ...baseMetadata, detected_rule: 'feature-update' },
+        metadata: { ...baseMetadata, detected_rule: 'feature-update', traceability: { source: 'learned_fact', confidence: 0.9 } },
       })
     }
   }
 
   if (entityName && /\b(now uses?|built with|tech stack|stack)\b/i.test(message)) {
-    const values = extractValueList(message)
+    const values = extractTechStackValue(message, entityName)
     if (values.length) {
       candidates.push({
         fact_type: 'project_update',
@@ -160,23 +224,23 @@ function detectLearningCandidates({ message, reply, context = {}, assistantProfi
         confidence: 0.9,
         source: 'conversation',
         status: 'pending',
-        metadata: { ...baseMetadata, detected_rule: 'tech-stack-update' },
+        metadata: { ...baseMetadata, detected_rule: 'tech-stack-update', traceability: { source: 'learned_fact', confidence: 0.9 } },
       })
     }
   }
 
   if (entityName && /\b(completed|in progress|done|launched|live|released)\b/i.test(message)) {
-    const statusMatch = message.match(/\b(completed|in progress|done|launched|live|released)\b/i)
-    if (statusMatch) {
+    const values = extractStatusValue(message)
+    if (values.length) {
       candidates.push({
         fact_type: 'project_update',
         entity_name: entityName,
         field_name: 'status',
-        field_value: [statusMatch[1].toLowerCase()],
+        field_value: values,
         confidence: 0.85,
         source: 'conversation',
         status: 'pending',
-        metadata: { ...baseMetadata, detected_rule: 'status-update' },
+        metadata: { ...baseMetadata, detected_rule: 'status-update', traceability: { source: 'learned_fact', confidence: 0.85 } },
       })
     }
   }
@@ -191,7 +255,7 @@ function detectLearningCandidates({ message, reply, context = {}, assistantProfi
       confidence: 0.72,
       source: 'conversation',
       status: 'pending',
-      metadata: { ...baseMetadata, detected_rule: 'faq-pattern' },
+      metadata: { ...baseMetadata, detected_rule: 'faq-pattern', traceability: { source: 'learned_fact', confidence: 0.72 } },
     })
   }
 
@@ -205,9 +269,17 @@ function formatFactValue(value) {
 }
 
 function pickLatestFact(facts, fieldName) {
-  const filtered = facts.filter((fact) => fact.field_name === fieldName)
+  const filtered = facts.filter((fact) => fact.field_name === fieldName && fact.is_active !== false)
   if (!filtered.length) return null
-  return filtered.sort((a, b) => new Date(b.approved_at || b.created_at) - new Date(a.approved_at || a.created_at))[0]
+  return filtered.sort((a, b) => {
+    const weightDelta = sourceWeight(b.source) - sourceWeight(a.source)
+    if (weightDelta !== 0) return weightDelta
+
+    const versionDelta = Number(b.version || 1) - Number(a.version || 1)
+    if (versionDelta !== 0) return versionDelta
+
+    return new Date(b.approved_at || b.created_at) - new Date(a.approved_at || a.created_at)
+  })[0]
 }
 
 function buildApprovedFactReply(entityName, facts, questionType) {
@@ -304,6 +376,7 @@ async function loadApprovedKnowledge() {
       .from('learned_facts')
       .select('*')
       .eq('status', 'approved')
+      .eq('is_active', true)
       .order('approved_at', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(200),
@@ -365,6 +438,16 @@ async function getKnowledgeReply({ message, context = {}, assistantProfile }) {
   if (!relevantFacts.length) return null
 
   const answer = buildApprovedFactReply(entityName || context.selectedProject || relevantFacts[0].entity_name, relevantFacts, questionType)
+  if (answer) {
+    console.log('Using learned facts:', relevantFacts.map((fact) => ({
+      entity: fact.entity_name,
+      field: fact.field_name,
+      source: fact.source,
+      confidence: fact.confidence,
+      version: fact.version || 1,
+      active: fact.is_active !== false,
+    })))
+  }
   return answer
 }
 
@@ -414,6 +497,8 @@ async function persistLearningCandidates({ message, reply, context = {}, assista
   for (const candidate of candidates) {
     if (!isMeaningfulCandidate(candidate)) continue
 
+    if (candidate.confidence < 0.75) continue
+
     const factKey = makeFactKey(candidate)
     const existing = await supabase.from('learned_facts').select('id,status').eq('fact_key', factKey).maybeSingle()
     if (existing.error && existing.error.code !== 'PGRST116') continue
@@ -437,6 +522,17 @@ async function persistLearningCandidates({ message, reply, context = {}, assista
       continue
     }
 
+    const versionResult = await supabase
+      .from('learned_facts')
+      .select('version')
+      .eq('entity_name', candidate.entity_name)
+      .eq('field_name', candidate.field_name)
+      .order('version', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    const nextVersion = versionResult.error && versionResult.error.code !== 'PGRST116' ? 1 : ((versionResult.data?.version || 0) + 1)
+
     await supabase.from('learned_facts').insert({
       fact_key: factKey,
       fact_type: candidate.fact_type,
@@ -446,6 +542,9 @@ async function persistLearningCandidates({ message, reply, context = {}, assista
       confidence: candidate.confidence,
       source: candidate.source,
       status: candidate.status,
+      version: nextVersion,
+      is_active: true,
+      source_weight: sourceWeight(candidate.source),
       metadata: candidate.metadata,
     })
   }

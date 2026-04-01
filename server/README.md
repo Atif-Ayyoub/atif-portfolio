@@ -65,5 +65,8 @@ Run these migrations before enabling Phase 2 on the assistant route:
 
 - `supabase/migrations/012_learned_facts.sql`
 - `supabase/migrations/013_faq_patterns.sql`
+- `supabase/migrations/014_learned_facts_versioning.sql`
 
 These tables are used for controlled learning only. Facts stay pending until you approve them in Supabase.
+
+Phase 2.5 adds learned-facts versioning and source weighting so approved knowledge can resolve conflicts safely, with the latest active, highest-trust fact winning retrieval.
