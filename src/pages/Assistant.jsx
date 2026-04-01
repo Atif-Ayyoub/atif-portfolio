@@ -577,7 +577,7 @@ export default function Assistant() {
               </div>
             </div>
 
-            <div className="assistant-panel__section">
+            <div className="assistant-panel__section hidden md:block">
               <p className="assistant-panel__label">Suggested questions</p>
               <div className="assistant-quick-actions">
                 {quickReplies.map((prompt) => (
@@ -654,7 +654,7 @@ export default function Assistant() {
           </section>
         </div>
 
-        <section className="assistant-footer card-shell">
+        <section className="assistant-footer card-shell hidden md:block">
           <div>
             <p className="assistant-panel__label">Contact shortcut</p>
             <h3>Need a faster human response?</h3>

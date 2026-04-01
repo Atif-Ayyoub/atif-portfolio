@@ -452,6 +452,14 @@
   line-height:1.8;
 }
 
+/* Ensure Tailwind's `hidden md:block` is respected for these assistant sections
+   — assistant.css previously set `display` which can override Tailwind utilities
+   on small screens. Target the `.hidden` variant specifically for mobile. */
+@media (max-width: 767px) {
+  .assistant-panel__section.hidden { display: none !important; }
+  .assistant-footer.hidden { display: none !important; }
+}
+
 @media (max-width: 1024px){
   .assistant-grid{
     grid-template-columns:1fr;
