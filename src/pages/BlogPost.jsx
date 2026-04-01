@@ -100,6 +100,11 @@ export default function BlogPost() {
           <span>{post.title}</span>
         </nav>
 
+        <Link to="/blog" className="blog-back-btn" aria-label="Back to Blog">
+          <span className="blog-back-btn__arrow" aria-hidden="true">&larr;</span>
+          <span>Back to Blog</span>
+        </Link>
+
         <header className="blog-post-header card-shell">
           <p className="blog-post-meta">
             <span>{post.category || 'General'}</span>
@@ -107,7 +112,9 @@ export default function BlogPost() {
           </p>
           <h1>{post.title}</h1>
           <p>{post.excerpt}</p>
-          <img src={post.coverImage || '/preview.png'} alt={`${post.title} cover`} className="blog-post-cover" />
+          <div className="blog-post-cover-wrap">
+            <img src={post.coverImage || '/preview.png'} alt={`${post.title} cover`} className="blog-post-cover" />
+          </div>
         </header>
 
         <section className="blog-post-content card-shell">{renderMarkdown(post.content)}</section>

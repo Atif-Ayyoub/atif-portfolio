@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
 import ConfirmModal from '../../components/admin/shared/ConfirmModal'
 import StatusBadge from '../../components/admin/shared/StatusBadge'
 import { usePortfolioData } from '../../context/PortfolioDataContext'
+import { supabase } from '../../lib/supabaseClient'
 
 const emptyForm = {
   title: '',
@@ -41,6 +42,80 @@ export default function AdminBlogPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [isUploading, setIsUploading] = useState(false)
+  const [imagePreview, setImagePreview] = useState('')
+  const [notif, setNotif] = useState(null)
+
+  useEffect(() => {
+    if (!notif) return undefined
+    const timer = setTimeout(() => setNotif(null), 4000)
+    return () => clearTimeout(timer)
+  }, [notif])
+
+  const uploadBlogImage = async (file) => {
+    if (!file) return
+    if (!supabase) {
+      setError('Supabase is not configured. Cannot upload image.')
+      return
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file.')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      setError('Image size must be less than 5MB.')
+      return
+    }
+
+    try {
+      setIsUploading(true)
+      setError('')
+
+      const fileName = `blog-cover-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      const fileExt = file.name.split('.').pop()
+      const uploadPath = `blog-covers/${fileName}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('blog-images')
+        .upload(uploadPath, file, { upsert: false })
+
+      if (uploadError) throw uploadError
+
+      const { data } = supabase.storage
+        .from('blog-images')
+        .getPublicUrl(uploadPath)
+
+      const imageUrl = data?.publicUrl
+      if (!imageUrl) throw new Error('Failed to get public URL for uploaded image')
+
+      setForm((prev) => ({ ...prev, coverImage: imageUrl }))
+      setImagePreview(imageUrl)
+      setSuccess('Image uploaded successfully!')
+    } catch (err) {
+      console.error('Image upload error:', err)
+      setError(`Image upload failed: ${err?.message || 'Unknown error'}`)
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleImageSelect = (event) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // Show local preview immediately
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result || '')
+      }
+      reader.readAsDataURL(file)
+      uploadBlogImage(file)
+    }
+  }
 
   const filteredPosts = useMemo(() => {
     return [...sortedBlogs]
@@ -58,6 +133,7 @@ export default function AdminBlogPage() {
   const onOpenCreate = () => {
     setEditing(null)
     setForm(emptyForm)
+    setImagePreview('')
     setError('')
     setSuccess('')
     setIsFormOpen(true)
@@ -70,6 +146,7 @@ export default function AdminBlogPage() {
       tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
       publishedAt: post.publishedAt ? String(post.publishedAt).slice(0, 16) : '',
     })
+    setImagePreview(post.coverImage || '')
     setError('')
     setSuccess('')
     setIsFormOpen(true)
@@ -83,6 +160,7 @@ export default function AdminBlogPage() {
   const onReset = () => {
     setEditing(null)
     setForm(emptyForm)
+    setImagePreview('')
     setError('')
   }
 
@@ -107,11 +185,12 @@ export default function AdminBlogPage() {
         },
         editing?.id,
       )
-      setSuccess(editing ? 'Blog post updated successfully.' : 'Blog post created successfully.')
+        setNotif({ type: 'success', message: editing ? 'Blog post updated successfully.' : 'Blog post created successfully.' })
       onReset()
       setIsFormOpen(false)
-    } catch {
-      setError('Unable to save blog post right now. Please try again.')
+    } catch (err) {
+      console.error('Blog save error:', err)
+        setNotif({ type: 'error', message: err?.message || 'Unable to save blog post right now. Please try again.' })
     }
   }
 
@@ -120,10 +199,11 @@ export default function AdminBlogPage() {
     try {
       await deleteBlog(deleteTarget.id)
       setDeleteTarget(null)
-      setSuccess('Blog post deleted successfully.')
+        setNotif({ type: 'success', message: 'Blog post deleted successfully.' })
       if (editing?.id === deleteTarget.id) onReset()
-    } catch {
-      setError('Unable to delete blog post right now. Please try again.')
+    } catch (err) {
+      console.error('Blog delete error:', err)
+        setNotif({ type: 'error', message: err?.message || 'Unable to delete blog post right now. Please try again.' })
     }
   }
 
@@ -192,9 +272,10 @@ export default function AdminBlogPage() {
                               setError('')
                               try {
                                 await upsertBlog({ ...post, isPublished: !post.isPublished }, post.id)
-                                setSuccess('Post status updated.')
-                              } catch {
-                                setError('Unable to update post status right now. Please try again.')
+                                setNotif({ type: 'success', message: 'Post status updated.' })
+                              } catch (err) {
+                                console.error('Blog status update error:', err)
+                                setNotif({ type: 'error', message: err?.message || 'Unable to update post status right now. Please try again.' })
                               }
                             }}
                           >
@@ -206,9 +287,10 @@ export default function AdminBlogPage() {
                               setError('')
                               try {
                                 await upsertBlog({ ...post, featured: !post.featured }, post.id)
-                                setSuccess('Post featured flag updated.')
-                              } catch {
-                                setError('Unable to update featured flag right now. Please try again.')
+                                setNotif({ type: 'success', message: 'Post featured flag updated.' })
+                              } catch (err) {
+                                console.error('Blog featured update error:', err)
+                                setNotif({ type: 'error', message: err?.message || 'Unable to update featured flag right now. Please try again.' })
                               }
                             }}
                           >
@@ -272,9 +354,53 @@ export default function AdminBlogPage() {
                 <textarea className="admin-form-textarea" style={{ minHeight: '220px' }} value={form.content} onChange={(event) => setForm((prev) => ({ ...prev, content: event.target.value }))} />
               </div>
 
-              <div className="admin-form-field">
-                <label className="admin-form-label">Cover Image URL</label>
-                <input className="admin-form-input" value={form.coverImage} onChange={(event) => setForm((prev) => ({ ...prev, coverImage: event.target.value }))} placeholder="https://..." />
+              <div className="admin-form-field admin-form-field-full">
+                <div style={{ marginBottom: '12px' }}>
+                  <label className="admin-form-label">Cover Image</label>
+                  <p className="admin-form-subtitle" style={{ marginTop: '2px', marginBottom: '10px' }}>Upload an image from your device or paste a URL</p>
+                  
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      disabled={isUploading}
+                      style={{
+                        flex: 1,
+                        padding: '8px 12px',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        cursor: isUploading ? 'not-allowed' : 'pointer',
+                        opacity: isUploading ? 0.6 : 1,
+                      }}
+                    />
+                    {isUploading && <span style={{ padding: '8px 12px', color: '#007bff' }}>Uploading...</span>}
+                  </div>
+
+                  <input
+                    className="admin-form-input"
+                    value={form.coverImage}
+                    onChange={(event) => setForm((prev) => ({ ...prev, coverImage: event.target.value }))}
+                    placeholder="https://... or upload image above"
+                  />
+                </div>
+
+                {imagePreview || form.coverImage ? (
+                  <div style={{ marginTop: '12px' }}>
+                    <label className="admin-form-label">Preview</label>
+                    <img
+                      src={imagePreview || form.coverImage}
+                      alt="Cover preview"
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '200px',
+                        borderRadius: '4px',
+                        border: '1px solid #ddd',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
 
               <div className="admin-form-field">
@@ -338,7 +464,44 @@ export default function AdminBlogPage() {
         onCancel={() => setDeleteTarget(null)}
         onConfirm={onConfirmDelete}
         confirmLabel="Delete Post"
-      />
+  />
+
+  {notif && (
+              <div
+                style={{
+                  position: 'fixed',
+                  bottom: '20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  padding: '14px 20px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  zIndex: 1000,
+                  animation: 'slideIn 0.3s ease-out',
+                  backgroundColor: notif.type === 'success' ? '#d4edda' : '#f8d7da',
+                  color: notif.type === 'success' ? '#155724' : '#721c24',
+                  border: `1px solid ${notif.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+                  maxWidth: '500px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                }}
+              >
+                {notif.message}
+              </div>
+          )}
+
+          <style>{`
+              @keyframes slideIn {
+                from {
+                  opacity: 0;
+                  transform: translateX(-50%) translateY(20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateX(-50%) translateY(0);
+                }
+              }
+            `}</style>
     </AdminLayout>
   )
 }

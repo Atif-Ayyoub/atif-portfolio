@@ -54,6 +54,16 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
+function shouldUseLocalBlogFallback(error) {
+  const code = String(error?.code || '')
+  const message = String(error?.message || '').toLowerCase()
+
+  if (code === '42P01' || code === 'PGRST205' || code === '42501') return true
+  if (message.includes('blog_posts') && (message.includes('does not exist') || message.includes('permission'))) return true
+
+  return false
+}
+
 export function PortfolioDataProvider({ children }) {
   const [services, setServices] = useState(() => parseStoredValue(STORAGE_KEYS.services, DEFAULT_SERVICES))
   const [projects, setProjects] = useState(() => parseStoredValue(STORAGE_KEYS.projects, DEFAULT_PROJECTS))
@@ -680,10 +690,20 @@ export function PortfolioDataProvider({ children }) {
     }
 
     if (hasSupabase) {
+      const dbPayload = mapAppBlogToDb(cleaned)
+      console.log('Attempting to save blog to Supabase:', dbPayload)
       const { error } = await supabase
         .from('blog_posts')
-        .upsert(mapAppBlogToDb(cleaned), { onConflict: 'id' })
-      if (error) throw error
+        .upsert(dbPayload, { onConflict: 'id' })
+      if (error && !shouldUseLocalBlogFallback(error)) {
+        const errorMsg = error?.message || 'Unknown database error'
+        const errorCode = error?.code || 'UNKNOWN'
+        console.error('Blog save error details:', { code: errorCode, message: errorMsg, fullError: error })
+        throw new Error(`${errorMsg} (Code: ${errorCode})`)
+      }
+      if (error && shouldUseLocalBlogFallback(error)) {
+        console.warn('Blog save fallback: using local storage because Supabase blog_posts is unavailable.', error)
+      }
     }
 
     setBlogs((prev) => {
@@ -700,7 +720,14 @@ export function PortfolioDataProvider({ children }) {
   const deleteBlog = async (id) => {
     if (hasSupabase) {
       const { error } = await supabase.from('blog_posts').delete().eq('id', id)
-      if (error) throw error
+      if (error && !shouldUseLocalBlogFallback(error)) {
+        const errorMsg = error?.message || 'Unknown database error'
+        const errorCode = error?.code || 'UNKNOWN'
+        throw new Error(`${errorMsg} (Code: ${errorCode})`)
+      }
+      if (error && shouldUseLocalBlogFallback(error)) {
+        console.warn('Blog delete fallback: using local storage because Supabase blog_posts is unavailable.', error)
+      }
     }
 
     setBlogs((prev) => {

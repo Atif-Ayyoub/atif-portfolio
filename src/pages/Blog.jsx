@@ -59,13 +59,16 @@ export default function Blog() {
 
           {filteredPosts.map((post) => (
             <article key={post.id} className="blog-card card-shell">
-              <img
-                src={post.coverImage || '/preview.png'}
-                alt={`${post.title} cover`}
-                loading="lazy"
-                decoding="async"
-                className="blog-card__image"
-              />
+              <div className="blog-card__image-wrap">
+                <img
+                  src={post.coverImage || '/preview.png'}
+                  alt={`${post.title} cover`}
+                  loading="lazy"
+                  decoding="async"
+                  className="blog-card__image"
+                  style={{ objectPosition: post.imagePosition || 'center' }}
+                />
+              </div>
               <div className="blog-card__content">
                 <p className="blog-card__meta">
                   <span>{post.category || 'General'}</span>
