@@ -45,6 +45,14 @@ export default function News(){
     return `${yyyy}-${mm}-${dd} ${hh}:${min}`
   }
 
+  function splitDateTime(raw){
+    if(!raw) return { dateOnly: '', timeOnly: '' }
+    const s = String(raw).trim()
+    const parts = s.split(' ')
+    if(parts.length === 1) return { dateOnly: parts[0], timeOnly: '' }
+    return { dateOnly: parts[0], timeOnly: parts.slice(1).join(' ') }
+  }
+
   useEffect(() => {
     let mounted = true
     const devUrl = 'https://dev.to/api/articles?per_page=10&tag=technology'
@@ -276,9 +284,22 @@ export default function News(){
 
             <div className="news-card-bottom">
               <div className="meta-row">
-                <div className="meta-item"><FaCalendarAlt className="meta-icon" /> {it.date}</div>
-                <div className="meta-item"><FaGlobe className="meta-icon" /> {it.source}</div>
-                <div className="meta-item"><FaClock className="meta-icon" /> {it.readTime ? `${it.readTime} read` : ''}</div>
+                {(() => {
+                  const { dateOnly, timeOnly } = splitDateTime(it.date)
+                  return (
+                    <>
+                      <div className="meta-item"><FaCalendarAlt className="meta-icon" /> {dateOnly}</div>
+                      <div className="meta-item"><FaGlobe className="meta-icon" /> {it.source}</div>
+                      <div className="meta-item">
+                        {timeOnly ? (
+                          <><FaClock className="meta-icon" /> {timeOnly}</>
+                        ) : it.readTime ? (
+                          <><FaClock className="meta-icon" /> {it.readTime} read</>
+                        ) : null}
+                      </div>
+                    </>
+                  )
+                })()}
               </div>
 
               <div className="news-content">
@@ -297,8 +318,16 @@ export default function News(){
               {selectedArticle.image ? <img src={selectedArticle.image} alt={`${selectedArticle.title} article hero image`} loading="lazy" decoding="async" className="news-modal-img" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/thumb-placeholder.svg' }} /> : null}
               <div className="news-modal-body">
                 <div className="meta-row">
-                  <div className="meta-item"><FaCalendarAlt className="meta-icon" /> {selectedArticle.date}</div>
-                  <div className="meta-item"><FaGlobe className="meta-icon" /> {selectedArticle.source}</div>
+                  {(() => {
+                    const { dateOnly, timeOnly } = splitDateTime(selectedArticle.date)
+                    return (
+                      <>
+                        <div className="meta-item"><FaCalendarAlt className="meta-icon" /> {dateOnly}</div>
+                        <div className="meta-item"><FaGlobe className="meta-icon" /> {selectedArticle.source}</div>
+                        {timeOnly ? <div className="meta-item"><FaClock className="meta-icon" /> {timeOnly}</div> : null}
+                      </>
+                    )
+                  })()}
                 </div>
                 <h2 className="news-title">{selectedArticle.title}</h2>
                 <p className="text-[var(--text-secondary)] mt-4">{selectedArticle.description}</p>
