@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaCalendarAlt, FaClock, FaGlobe } from 'react-icons/fa'
 import { supabase } from '../lib/supabaseClient'
+import Seo from '../components/Seo'
 
 function pick(item, ...keys){
   for(const k of keys) if(item && item[k] !== undefined) return item[k]
@@ -222,8 +223,14 @@ export default function News(){
 
   return (
     <motion.section initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="p-12">
+      <Seo
+        title="AI, Web & Software News | Atif Ayyoub"
+        description="Latest AI, web development, and software news curated for developers and tech-focused businesses."
+        pathname="/news"
+        noindex
+      />
       <div className="contact-hero">
-        <h1 className="services-title">Latest News</h1>
+        <h1 className="services-title">AI, Web &amp; Software News</h1>
         <p className="text-[var(--text-secondary)] mt-5">Stay updated with technology news</p>
       </div>
 
@@ -261,8 +268,8 @@ export default function News(){
               <div className="news-type news-tag">{it.topic || 'Dev'}</div>
               <div className="news-thumb news-image">
                 {it.image
-                  ? <img src={it.image} alt="thumb" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage }} />
-                  : <img src={placeholderImage} alt="thumb" />}
+                  ? <img src={it.image} alt={`${it.title} article thumbnail`} loading="lazy" decoding="async" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = placeholderImage }} />
+                  : <img src={placeholderImage} alt="Technology news article thumbnail placeholder" loading="lazy" decoding="async" />}
               </div>
             </div>
 
@@ -286,7 +293,7 @@ export default function News(){
           <div className="modal-overlay" onClick={() => setSelectedArticle(null)}>
             <div className="news-modal" onClick={(e)=>e.stopPropagation()}>
               <button className="modal-close" onClick={() => setSelectedArticle(null)}>×</button>
-              {selectedArticle.image ? <img src={selectedArticle.image} alt="hero" className="news-modal-img" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/thumb-placeholder.svg' }} /> : null}
+              {selectedArticle.image ? <img src={selectedArticle.image} alt={`${selectedArticle.title} article hero image`} loading="lazy" decoding="async" className="news-modal-img" onError={(e)=>{ e.currentTarget.onerror = null; e.currentTarget.src = '/thumb-placeholder.svg' }} /> : null}
               <div className="news-modal-body">
                 <div className="meta-row">
                   <div className="meta-item"><FaCalendarAlt className="meta-icon" /> {selectedArticle.date}</div>

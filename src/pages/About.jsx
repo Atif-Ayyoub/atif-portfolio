@@ -1,5 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import { FaBookOpen, FaBrain, FaCode, FaMobileAlt, FaNodeJs, FaPalette, FaPlane, FaPython, FaReact } from 'react-icons/fa'
 import './about.css'
@@ -77,11 +78,16 @@ export default function About(){
 
   return (
     <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="about-v2">
+      <Seo
+        title="About Atif Ayyoub | AI Web & Custom Software Developer"
+        description="Learn more about Atif Ayyoub, an AI Web & Custom Software Developer specializing in web apps, AI tools, APIs, and custom software."
+        pathname="/about"
+      />
       <div className="about-v2__glow about-v2__glow--a" aria-hidden="true" />
       <div className="about-v2__glow about-v2__glow--b" aria-hidden="true" />
 
       <section className="about-v2__hero-wrap">
-        <h2 className="about-v2__title">{settings.aboutHeading || 'About Me'}</h2>
+        <h1 className="about-v2__title">About Atif Ayyoub</h1>
         <p className="about-v2__subtitle">{settings.aboutDescription || 'Get to know me better'}</p>
 
         <div className="about-v2__hero-grid">

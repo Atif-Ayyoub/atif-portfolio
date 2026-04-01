@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import TechStack from '../components/TechStack'
+import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import { getSocialIcon } from '../admin/iconMaps'
 import './home.css'
@@ -90,14 +91,20 @@ export default function Home() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
     >
+      <Seo
+        title="Atif Ayyoub | AI Web & Custom Software Developer"
+        description="Portfolio of Atif Ayyoub, an AI Web & Custom Software Developer building scalable web apps, dashboards, APIs, and custom software solutions."
+        pathname="/"
+      />
       <div className="home-v2__container">
         <section className="home-v2__hero card-shell">
           <div className="home-v2__hero-content">
             <p className="home-v2__intro">{settings.introLine || "Hi, I'm"}</p>
-            <h1 className="home-v2__name">{settings.fullName}</h1>
+            <h1 className="home-v2__name">AI Web &amp; Custom Software Developer</h1>
+            <p className="home-v2__intro">{settings.fullName || 'Atif Ayyoub'}</p>
             <p className="home-v2__role">{settings.heroTitle}</p>
             <p className="home-v2__subtitle">
-              {settings.heroSubtitle || 'Building elegant products with modern design, strong engineering, and performance-first delivery.'}
+              {settings.heroSubtitle || 'AI Web Developer, Full Stack Developer, and React Developer building elegant products with modern design and performance-first delivery.'}
             </p>
 
             <div className="home-v2__actions">
@@ -111,7 +118,10 @@ export default function Home() {
                 Download Resume
               </a>
               <button className="home-v2__btn home-v2__btn--ghost" onClick={() => navigate('/contact')}>
-                Contact Me
+                Contact Atif Ayyoub
+              </button>
+              <button className="home-v2__btn home-v2__btn--ghost" onClick={() => navigate('/projects')}>
+                View My Projects
               </button>
             </div>
           </div>

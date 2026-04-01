@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import ProjectShowcase from '../components/ProjectShowcase'
 import ProjectCard from '../components/ProjectCard'
+import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 
 export default function Projects(){
+  const navigate = useNavigate()
   const { sortedProjects } = usePortfolioData()
   const publicProjects = useMemo(() => {
     return sortedProjects
@@ -42,11 +45,16 @@ export default function Projects(){
 
   return (
     <section className="relative min-h-screen py-12 px-6 lg:px-12 bg-gradient-to-b from-[#020617] to-[#071028] projects-page">
+      <Seo
+        title="Web, AI & Software Projects | Atif Ayyoub"
+        description="Browse web, AI, and software projects by Atif Ayyoub including scalable web apps, dashboards, and API-driven products."
+        pathname="/projects"
+      />
       <div className="projects-bg-blob" aria-hidden="true" />
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 mb-4 rounded-full px-4 py-2 text-xs text-white/60 bg-white/[0.03]">Case Studies</div>
-          <h1 className="text-4xl md:text-6xl font-extrabold">My <span className="text-cyan-300">Projects</span></h1>
+          <h1 className="text-4xl md:text-6xl font-extrabold">Web, AI &amp; Software <span className="text-cyan-300">Projects</span></h1>
           <p className="mt-4 text-white/60 max-w-3xl mx-auto">Selected work, case studies, and product builds. A cinematic showcase of web apps, AI tools, dashboards, and custom software solutions.</p>
           <div className="mt-[30px] flex flex-wrap gap-[20px] justify-center">
             {filters.map(f => (
@@ -101,6 +109,16 @@ export default function Projects(){
                 <p className="project-stat-label">{item.label}</p>
               </motion.article>
             ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <button
+              type="button"
+              className="btn-contact px-6 py-3 rounded-full font-semibold"
+              onClick={() => navigate('/services')}
+            >
+              Explore Services
+            </button>
           </div>
         </main>
       </div>

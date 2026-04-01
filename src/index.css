@@ -412,6 +412,51 @@ html { scroll-behavior: smooth }
   .sidebar .profile-block > p{ display:none }
 
   /* show only icons on mobile top bar */
+
+}
+
+/* Mobile-only (narrow) header card and horizontal icons */
+@media (max-width: 767px){
+  .sidebar{
+    position:static;
+    top:0;
+    left:0;
+    right:0;
+    width:100%;
+    height:auto;
+    padding:8px 6px;
+    border-right:0;
+    border-bottom:0;
+    z-index:40;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .sidebar .profile-block{ display:none }
+
+  .mobile-header-card{
+    margin-top:14px;
+    margin-left:0;
+    margin-right:0;
+    padding:10px 14px;
+    display:flex;
+    align-items:center;
+    gap:20px;
+    border-radius:12px;
+    background: rgba(255,255,255,0.02);
+    border:1px solid var(--border);
+    width:100%;
+  }
+
+  .mobile-profile-image{ width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid var(--primary) }
+
+  .mobile-header-text h2{ margin:0; font-size:16px; font-weight:700 }
+  .mobile-header-text p{ margin:0; font-size:12px; color:var(--muted, #9ca3af) }
+
+  /* present nav icons horizontally below the header card */
+  .nav-menu{ display:flex; flex-direction:row; gap:0; justify-content:center; margin-top:30px; padding:0 10px; width:100%; }
+  .nav-item{ display:flex; align-items:center; justify-content:center; padding:8px; margin:0 10px }
   .collapse-btn{ display:none }
   .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:12px; align-items:center; flex-wrap:nowrap }
   .nav-item{ padding:6px; border-radius:8px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center }

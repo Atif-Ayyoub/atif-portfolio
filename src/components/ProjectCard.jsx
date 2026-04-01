@@ -18,7 +18,7 @@ export default function ProjectCard({ project, large = false, className = '' }){
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40" />
           <div className="flex items-center justify-center h-full text-white/40">
             {project.image
-              ? <img src={project.image} alt="preview" className="project-card-image object-cover w-full h-full" />
+              ? <img src={project.image} alt={`${project.title} project preview by Atif Ayyoub`} loading="lazy" decoding="async" className="project-card-image object-cover w-full h-full" />
               : <div className="text-sm">Project Screenshot Placeholder</div>}
           </div>
         </div>

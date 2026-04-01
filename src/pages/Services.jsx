@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import ServiceCard from '../components/ServiceCard'
+import Seo from '../components/Seo'
 import { getServiceIcon } from '../admin/iconMaps'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 
@@ -20,9 +21,14 @@ export default function Services(){
 
   return (
     <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="p-12 services-page">
+      <Seo
+        title="Web Development, AI Integration & Software Services | Atif Ayyoub"
+        description="Explore AI web development, API development, and custom software services offered by Atif Ayyoub for startups and modern businesses."
+        pathname="/services"
+      />
       <div className="services-bg-blob" aria-hidden="true" />
-      <h2 className="text-4xl font-extrabold services-title">My Services</h2>
-      <p className="services-subtitle">Clean code, fast delivery, and modern digital experiences.</p>
+      <h1 className="text-4xl font-extrabold services-title">Web Development, AI Integration &amp; Software Services</h1>
+      <p className="services-subtitle">Clean code, fast delivery, and modern digital experiences for startups, businesses, and SaaS products.</p>
 
       <div className="mt-8 grid services-grid">
         {activeServices.map((service, index) => (
@@ -62,7 +68,7 @@ export default function Services(){
             <li>Clean Code</li>
             <li>Modern UI</li>
           </ul>
-          <button type="button" aria-label="Start a Project" className="mt-6 gradient-btn px-6 py-3 rounded-full font-semibold" onClick={() => navigate('/contact')}>Start a Project</button>
+          <button type="button" aria-label="Contact Atif Ayyoub" className="mt-6 gradient-btn px-6 py-3 rounded-full font-semibold" onClick={() => navigate('/contact')}>Contact Atif Ayyoub</button>
         </div>
       </motion.div>
     </motion.div>

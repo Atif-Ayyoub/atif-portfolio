@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { getSocialIcon } from '../admin/iconMaps'
+import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 
 export default function Contact(){
@@ -35,9 +36,14 @@ export default function Contact(){
 
   return (
     <motion.div initial={{opacity:0,y:40}} animate={{opacity:1,y:0}} transition={{duration:0.6}} className="p-12 max-w-3xl">
+      <Seo
+        title="Contact Atif Ayyoub | AI Web & Custom Software Developer"
+        description="Contact Atif Ayyoub for AI web development, API development, and custom software projects for startups and businesses."
+        pathname="/contact"
+      />
       <div className="contact-hero">
-        <h2 className="font-extrabold services-title">Get In Touch</h2>
-        <p className="text-[var(--text-secondary)] mt-5">I'd love to hear from you. Send me a message and I'll respond as soon as possible.</p>
+        <h1 className="font-extrabold services-title">Contact Atif Ayyoub</h1>
+        <p className="text-[var(--text-secondary)] mt-5">I'd love to hear from you. Send a message for freelance React Developer or Full Stack Developer projects.</p>
       </div>
 
       <div className="contact-grid">
