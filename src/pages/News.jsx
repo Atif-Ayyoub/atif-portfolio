@@ -144,7 +144,8 @@ export default function News(){
         }
       }
 
-      const finalList = withTopic(merged)
+      // Only include articles that have an image/thumbnail URL
+      const finalList = withTopic(merged).filter((a) => a && a.image && String(a.image).trim())
       setItems(finalList)
       if(shouldPersist) void persistItems(finalList)
     }
