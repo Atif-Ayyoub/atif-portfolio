@@ -18,60 +18,56 @@ export default function ProjectCard({ project, large = false, className = '' }){
 
   return (
     <motion.article
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -4 }}
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
-      className={`project-card relative overflow-hidden bg-[rgba(255,255,255,0.02)] backdrop-blur-xl ${className} rounded-[20px] border border-transparent`}
+      className={`project-card ${className}`}
     >
-      <div className="relative flex flex-col h-full p-4 md:p-6">
+      <div className="project-card-inner">
 
-        {/* Image */}
-        <div className="project-card-img-wrap relative rounded-lg overflow-hidden bg-[#071025] h-[220px] border border-[var(--border)]">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40" />
-          <div className="flex items-center justify-center h-full text-white/40">
+        <div className="project-card-media">
+          <div className="project-card-media-overlay" />
+          <div className="project-card-media-content">
             {project.image
               ? <img src={project.image} alt={`${project.title} AI web development project for ${project.category || 'modern apps'}`} loading="lazy" decoding="async" className="project-card-image object-cover w-full h-full" />
               : <div className="text-sm">Project Screenshot Placeholder</div>}
           </div>
         </div>
 
-        {/* Title */}
-        <h3
-          className={`project-card-title mt-4 font-bold text-white ${large ? 'text-2xl' : 'text-lg'}`}
-          style={['Student Evaluation System', 'Wallpaper Hub'].includes(project.title) ? { marginTop: '10px' } : undefined}
-        >
-          {project.title}
-        </h3>
+        <div className="project-card-copy">
+          <h3
+            className={`project-card-title ${large ? 'text-2xl' : 'text-lg'}`}
+            style={['Student Evaluation System', 'Wallpaper Hub'].includes(project.title) ? { marginTop: '10px' } : undefined}
+          >
+            {project.title}
+          </h3>
+          <p className="project-desc">{project.description}</p>
+        </div>
 
-        {/* Description */}
-        <p className="project-desc mt-2">{project.description}</p>
-
-        {/* Tech Tags */}
         <div className="project-tags-row">
           {project.tags?.slice(0,5).map(t => (
             <span key={t} className="tech-tag">{t}</span>
           ))}
         </div>
 
-        {/* Buttons */}
         <div className="project-buttons">
-          <Link to={`/projects/${caseStudySlug}`} className="btn-contact project-btn inline-flex items-center gap-2 text-sm">
+          <Link to={`/projects/${caseStudySlug}`} className="project-action project-action-primary inline-flex items-center gap-2 text-sm">
             View Case Study
           </Link>
           {project.liveUrl ? (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="btn-resume project-btn text-sm inline-flex items-center gap-1">
-              View Live AI Web App <ArrowUpRight size={15} />
+            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="project-action project-action-secondary text-sm inline-flex items-center gap-1">
+              Live Demo <ArrowUpRight size={15} />
             </a>
           ) : (
-            <button className="btn-resume project-btn text-sm" disabled>View Live AI Web App</button>
+            <button className="project-action project-action-secondary text-sm" disabled>Live Demo</button>
           )}
           {project.repo ? (
-            <a className="btn-contact project-btn inline-flex items-center gap-2 text-sm" href={project.repo} target="_blank" rel="noreferrer">
-              <Github size={15} /> Source Code
+            <a className="project-action project-action-tertiary inline-flex items-center gap-2 text-sm" href={project.repo} target="_blank" rel="noreferrer">
+              <Github size={15} /> Code
             </a>
           ) : (
-            <button className="btn-contact project-btn text-sm" disabled>Source Code</button>
+            <button className="project-action project-action-tertiary text-sm" disabled>Code</button>
           )}
         </div>
 

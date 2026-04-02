@@ -18,7 +18,7 @@ export default function ProjectShowcase({ featured, side = [] }){
           </div>
 
           {/* center featured */}
-          <div className="relative mx-auto w-full max-w-[520px] z-20">
+          <div className="relative mx-auto w-full max-w-[520px]">
             <ProjectCard project={featured} large />
           </div>
 

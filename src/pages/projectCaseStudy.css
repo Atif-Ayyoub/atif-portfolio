@@ -1,0 +1,261 @@
+.case-study-shell {
+  position: relative;
+  width: 100%;
+  padding: 32px 24px 96px;
+  font-family: 'Inter', 'Satoshi', 'Geist', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 560px at 12% -10%, rgba(56, 189, 248, 0.12), transparent 62%),
+    radial-gradient(900px 420px at 88% -6%, rgba(99, 102, 241, 0.14), transparent 60%),
+    #050914;
+}
+
+.case-study-wrap {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.case-hero {
+  padding: 100px 0 60px;
+}
+
+.case-kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(188, 207, 247, 0.72);
+  font-weight: 600;
+}
+
+.case-title {
+  margin: 14px 0 0;
+  font-size: clamp(2.35rem, 6vw, 4.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  color: #f3f7ff;
+  max-width: 14ch;
+}
+
+.case-lead {
+  margin: 20px 0 0;
+  max-width: 720px;
+  font-size: 1.06rem;
+  line-height: 1.8;
+  color: rgba(213, 225, 244, 0.74);
+}
+
+.case-actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.case-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 180ms ease, box-shadow 220ms ease, background-color 220ms ease, border-color 220ms ease, color 220ms ease;
+}
+
+.case-btn:hover {
+  transform: translateY(-2px);
+}
+
+.case-btn-primary {
+  color: #eef2ff;
+  background: linear-gradient(135deg, #3b82f6, #6366f1 52%, #7c3aed);
+  box-shadow: 0 8px 30px rgba(79, 70, 229, 0.24);
+}
+
+.case-btn-primary:hover {
+  box-shadow: 0 10px 36px rgba(99, 102, 241, 0.34);
+}
+
+.case-btn-secondary {
+  color: #dbe8ff;
+  background: rgba(12, 18, 34, 0.35);
+  border: 1px solid rgba(201, 218, 255, 0.22);
+}
+
+.case-btn-secondary:hover {
+  background: rgba(27, 38, 69, 0.5);
+  border-color: rgba(201, 218, 255, 0.38);
+}
+
+.case-btn-tertiary {
+  color: rgba(218, 230, 255, 0.84);
+  background: transparent;
+}
+
+.case-btn-tertiary:hover {
+  color: #f4f8ff;
+}
+
+.case-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 18px 0;
+}
+
+.case-meta-item {
+  min-height: 90px;
+}
+
+.case-meta-label {
+  margin: 0;
+  font-size: 0.73rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(184, 205, 243, 0.62);
+  font-weight: 600;
+}
+
+.case-meta-value {
+  margin: 11px 0 0;
+  color: #ecf3ff;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.case-tech-pills {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.case-tech-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(170, 196, 244, 0.24);
+  background: rgba(17, 26, 49, 0.54);
+  color: rgba(218, 230, 255, 0.88);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.case-preview {
+  margin: 48px 0;
+}
+
+.case-preview-image {
+  display: block;
+  width: 100%;
+  max-height: 620px;
+  object-fit: cover;
+  border-radius: 18px;
+  box-shadow: 0 22px 65px rgba(0, 0, 0, 0.42);
+  transition: transform 220ms ease, box-shadow 240ms ease;
+}
+
+.case-preview-image:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 26px 72px rgba(0, 0, 0, 0.5);
+}
+
+.case-content {
+  padding: 24px 0 8px;
+}
+
+.case-block {
+  max-width: 760px;
+  margin-bottom: 50px;
+}
+
+.case-block h2 {
+  margin: 0;
+  font-size: 1.65rem;
+  line-height: 1.22;
+  color: #e8f1ff;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.case-block p {
+  margin: 14px 0 0;
+  color: rgba(208, 222, 244, 0.72);
+  line-height: 1.9;
+  font-size: 1rem;
+}
+
+.case-back-link-wrap {
+  margin-top: 10px;
+}
+
+.case-back-link {
+  display: inline-flex;
+  align-items: center;
+  color: rgba(190, 214, 249, 0.9);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(190, 214, 249, 0.28);
+  padding-bottom: 3px;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.case-back-link:hover {
+  color: #eef4ff;
+  border-color: rgba(238, 244, 255, 0.68);
+}
+
+@media (max-width: 960px) {
+  .case-study-shell {
+    padding: 26px 20px 84px;
+  }
+
+  .case-hero {
+    padding: 88px 0 52px;
+  }
+
+  .case-meta {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .case-meta-item {
+    min-height: auto;
+  }
+
+  .case-preview {
+    margin: 42px 0;
+  }
+
+  .case-block {
+    margin-bottom: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  .case-title {
+    font-size: clamp(2.1rem, 11vw, 2.8rem);
+  }
+
+  .case-lead {
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .case-actions {
+    gap: 10px;
+  }
+
+  .case-btn {
+    min-height: 42px;
+    padding: 0 16px;
+  }
+
+  .case-block h2 {
+    font-size: 1.4rem;
+  }
+}
