@@ -380,7 +380,7 @@ html { scroll-behavior: smooth }
   width:220px;
   height:220px;
   border-radius:50%;
-  background: url('/Atif1.png') center/cover no-repeat, linear-gradient(135deg, rgba(79,70,229,0.12), rgba(34,211,238,0.06));
+  background: url('/atif-ayyoub-ai-developer.png') center/cover no-repeat, linear-gradient(135deg, rgba(79,70,229,0.12), rgba(34,211,238,0.06));
   border:3px solid var(--primary);
   display:flex;
   align-items:center;

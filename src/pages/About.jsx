@@ -147,7 +147,7 @@ export default function About(){
 
           <div className="about-v2__photo">
             <div className="about-v2__image-wrap">
-              <div className="about-v2__image-ring" style={{ backgroundImage: `url(${settings.heroImage || '/Atif1.png'})` }} />
+              <div className="about-v2__image-ring" style={{ backgroundImage: `url(${settings.heroImage || '/atif-ayyoub-ai-developer.png'})` }} role="img" aria-label="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" />
             </div>
           </div>
 

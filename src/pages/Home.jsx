@@ -129,9 +129,9 @@ export default function Home() {
           <div className="home-v2__hero-image-wrap">
             <div
               className="home-v2__hero-image"
-              style={{ backgroundImage: `url(${settings.heroImage || '/Atif1.png'})` }}
+              style={{ backgroundImage: `url(${settings.heroImage || '/atif-ayyoub-ai-developer.png'})` }}
               role="img"
-              aria-label={settings.fullName || 'Profile image'}
+              aria-label="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer"
             />
           </div>
         </section>

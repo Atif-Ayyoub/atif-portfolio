@@ -11,8 +11,8 @@ export const DEFAULT_SETTINGS = {
   nationality: 'Pakistan',
   languages: 'English, Urdu, Punjabi',
   resumeLink: '',
-  profileImage: '/Atif.png',
-  heroImage: '/Atif1.png',
+  profileImage: '/atif-ayyoub-profile.png',
+  heroImage: '/atif-ayyoub-ai-developer.png',
   introLine: "Hi, I\'m Atif Ayyoub",
   professionalTagline: 'Consistency Makes a Man Perfect in Their Skill Set.',
   aboutContent:
@@ -268,7 +268,7 @@ Ship in small increments, monitor regressions, and keep rollback paths simple.
 ## Conclusion
 
 Scalability is the result of repeated engineering discipline, not one-time optimization.` ,
-    coverImage: '/Atif1.png',
+    coverImage: '/atif-ayyoub-ai-developer.png',
     category: 'Web Dev',
     targetKeyword: 'scalable web apps',
     seoTitle: 'How to Build Scalable Web Apps | Atif Ayyoub',
@@ -301,7 +301,7 @@ Define milestone-based delivery, weekly reporting, and acceptance criteria for e
 ## Conclusion
 
 Hiring success comes from process clarity as much as technical talent.` ,
-    coverImage: '/Atif.png',
+    coverImage: '/atif-ayyoub-profile.png',
     category: 'Business',
     targetKeyword: 'hire web developer Pakistan',
     seoTitle: 'Hire Web Developer in Pakistan (2026) | Atif Ayyoub',
