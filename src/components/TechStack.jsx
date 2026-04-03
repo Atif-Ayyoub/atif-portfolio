@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { OrbitControls, Html } from "@react-three/drei"
 import "./TechStack.css"
@@ -16,7 +16,7 @@ const techStack = [
   { name: 'GitHub', Icon: FaGithub, position: [-1.6, -1.6, 0] },
 ]
 
-function Sphere({ name, Icon, position, onHover }) {
+function Sphere({ name, Icon, position, onHover, sphereColor, radius = 0.72 }) {
   const mesh = useRef()
 
   useFrame(() => {
@@ -27,10 +27,10 @@ function Sphere({ name, Icon, position, onHover }) {
     <mesh ref={mesh} position={position}
       onPointerOver={(e)=>{ e.stopPropagation(); onHover && onHover(name) }}
       onPointerOut={(e)=>{ e.stopPropagation(); onHover && onHover(null) }}>
-      <sphereGeometry args={[0.72, 64, 64]} />
+      <sphereGeometry args={[radius, 64, 64]} />
 
       <meshPhysicalMaterial
-        color="#1e293b"
+        color={sphereColor}
         metalness={0.6}
         roughness={0.2}
         clearcoat={1}
@@ -49,14 +49,23 @@ function CenterCard() {
     <Html center>
       <div className="center-card">
         <h2>Atif</h2>
-        <p>Full Stack Developer</p>
+        <p className="center-sub"><span className="full">Full Stack </span><span className="dev">Developer</span></p>
       </div>
     </Html>
   )
 }
 
+function readThemeColor(varName, fallback) {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
+  return value || fallback
+}
+
 export default function TechStack(){
   const [hovered, setHovered] = React.useState(null)
+  const [themeSeed, setThemeSeed] = useState(0)
+  const [sphereRadius, setSphereRadius] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 768) ? 0.45 : 0.72)
+  const [posScale, setPosScale] = useState(() => (typeof window !== 'undefined' && window.innerWidth < 768) ? 0.65 : 1)
 
   const descriptions = {
     React: 'React — Frontend library for building interactive UIs.',
@@ -68,6 +77,26 @@ export default function TechStack(){
     MySQL: 'MySQL — Relational database system.',
     GitHub: 'GitHub — Code hosting and collaboration.'
   }
+
+  useEffect(() => {
+    const handleThemeChange = () => setThemeSeed((value) => value + 1)
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768
+      setSphereRadius(isMobile ? 0.45 : 0.72)
+      setPosScale(isMobile ? 0.65 : 1)
+    }
+
+    handleResize()
+    window.addEventListener('portfolio-theme-change', handleThemeChange)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('portfolio-theme-change', handleThemeChange)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
+
+  // use theme primary/accent color for better visibility and theme coherence
+  const sphereColor = readThemeColor('--primary', '#4f46e5')
   return (
     <div className="tech-container">
       <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
@@ -76,7 +105,15 @@ export default function TechStack(){
         <pointLight position={[-5, -5, -5]} intensity={1} />
 
         {techStack.map((tech, index) => (
-          <Sphere key={index} name={tech.name} Icon={tech.Icon} position={tech.position} onHover={setHovered} />
+          <Sphere
+            key={`${themeSeed}-${index}`}
+            name={tech.name}
+            Icon={tech.Icon}
+            position={tech.position.map(p => p * posScale)}
+            onHover={setHovered}
+            sphereColor={sphereColor}
+            radius={sphereRadius}
+          />
         ))}
 
         <CenterCard />

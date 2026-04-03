@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react'
 import AdminLayout from '../../components/admin/AdminLayout'
 import ConfirmModal from '../../components/admin/shared/ConfirmModal'
 import StatusBadge from '../../components/admin/shared/StatusBadge'
+import { BLOG_CATEGORY_OPTIONS } from '../../admin/seedData'
 import { usePortfolioData } from '../../context/PortfolioDataContext'
 import { supabase } from '../../lib/supabaseClient'
 
@@ -32,6 +33,17 @@ function toSlug(value) {
     .replace(/^-+|-+$/g, '')
 }
 
+function splitCategories(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function formatCategories(values) {
+  return [...new Set(values)].join(', ')
+}
+
 export default function AdminBlogPage() {
   const { sortedBlogs, upsertBlog, deleteBlog } = usePortfolioData()
   const [query, setQuery] = useState('')
@@ -45,6 +57,7 @@ export default function AdminBlogPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [imagePreview, setImagePreview] = useState('')
   const [notif, setNotif] = useState(null)
+  const selectedCategories = useMemo(() => splitCategories(form.category), [form.category])
 
   useEffect(() => {
     if (!notif) return undefined
@@ -143,6 +156,7 @@ export default function AdminBlogPage() {
     setEditing(post)
     setForm({
       ...post,
+      category: formatCategories(splitCategories(post.category)),
       tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
       publishedAt: post.publishedAt ? String(post.publishedAt).slice(0, 16) : '',
     })
@@ -172,6 +186,7 @@ export default function AdminBlogPage() {
     if (!form.title.trim()) return setError('Post title is required.')
     if (!form.excerpt.trim()) return setError('Excerpt is required.')
     if (!form.content.trim()) return setError('Article content is required.')
+    if (selectedCategories.length === 0) return setError('Select at least one category.')
     if (!form.targetKeyword.trim()) return setError('Target keyword is required.')
     if (Number.isNaN(Number(form.displayOrder))) return setError('Display order must be numeric.')
 
@@ -180,6 +195,7 @@ export default function AdminBlogPage() {
         {
           ...form,
           slug: form.slug ? toSlug(form.slug) : toSlug(form.title),
+          category: formatCategories(selectedCategories),
           tags: form.tags,
           publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : new Date().toISOString(),
         },
@@ -334,9 +350,50 @@ export default function AdminBlogPage() {
                 <input className="admin-form-input" value={form.slug} onChange={(event) => setForm((prev) => ({ ...prev, slug: toSlug(event.target.value) }))} placeholder="auto-from-title" />
               </div>
 
-              <div className="admin-form-field">
-                <label className="admin-form-label">Category</label>
-                <input className="admin-form-input" value={form.category} onChange={(event) => setForm((prev) => ({ ...prev, category: event.target.value }))} placeholder="AI, Web Dev, Business" />
+              <div className="admin-form-field admin-form-field-full">
+                <label className="admin-form-label">Categories</label>
+                <p className="admin-form-subtitle" style={{ marginTop: '2px', marginBottom: '10px' }}>Select one or more categories that fit the article.</p>
+                <div className="admin-form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+                  {BLOG_CATEGORY_OPTIONS.map((option) => {
+                    const isChecked = selectedCategories.includes(option)
+                    return (
+                      <label
+                        key={option}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          border: '1px solid rgba(255,255,255,0.12)',
+                          borderRadius: '12px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(event) => {
+                            setForm((prev) => {
+                              const current = splitCategories(prev.category)
+                              const next = event.target.checked
+                                ? [...current, option]
+                                : current.filter((item) => item !== option)
+
+                              return {
+                                ...prev,
+                                category: formatCategories(next),
+                              }
+                            })
+                          }}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+                <p className="admin-form-subtitle" style={{ marginTop: '10px', marginBottom: 0 }}>
+                  Selected: {selectedCategories.length > 0 ? selectedCategories.join(', ') : 'None'}
+                </p>
               </div>
 
               <div className="admin-form-field">

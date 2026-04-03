@@ -47,10 +47,10 @@
   font-weight:700;
   letter-spacing:-0.5px;
   text-align:center;
-  background:linear-gradient(90deg,#6366F1,#3B82F6);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  background:none;
+  -webkit-background-clip:initial;
+  background-clip:initial;
+  color:var(--text-primary);
 }
 
 .about-v2__subtitle{
@@ -137,10 +137,10 @@
   font-size:36px;
   font-weight:700;
   letter-spacing:-0.5px;
-  background:linear-gradient(90deg,#6366F1,#3B82F6);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
+  background:none;
+  -webkit-background-clip:initial;
+  background-clip:initial;
+  color:var(--text-primary);
   margin-bottom:24px;
 }
 
@@ -167,7 +167,8 @@
 .about-v2__stat-value{
   font-size:32px;
   font-weight:700;
-  color:#3B82F6;
+  color:var(--accent-secondary);
+  background:none;
 }
 
 .about-v2__stat-label{
@@ -261,7 +262,7 @@
 .about-v2__interest-card{
   padding:18px;
   border-radius:12px;
-  background:rgba(30,41,59,0.6);
+  background:transparent;
   text-align:center;
   border:1px solid rgba(255,255,255,0.06);
   transition:all .25s ease;
@@ -430,3 +431,38 @@
   .about-v2__glow{ filter: blur(80px); opacity:0.18 }
   .about-v2__image-ring{ backface-visibility: hidden; transform: translateZ(0) }
 }
+
+/* Theme-aware overrides */
+.about-v2__glow--a{ background:radial-gradient(circle, color-mix(in srgb, var(--accent-secondary) 34%, transparent), transparent 70%) }
+.about-v2__glow--b{ background:radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 34%, transparent), transparent 70%) }
+.about-v2__hero-wrap{ border-color:color-mix(in srgb, var(--border-color) 82%, var(--accent-secondary) 18%); background:linear-gradient(145deg, color-mix(in srgb, var(--card-bg) 88%, #ffffff 12%), color-mix(in srgb, var(--card-bg) 72%, #0a1020 28%)) }
+.about-v2__title,.about-v2__section-title{
+  /* removed background gradient per request - use accent color for titles */
+  background: none !important;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  color: var(--accent-primary);
+}
+.about-v2__subtitle,.about-v2__stat-label,.about-v2__skill-progress-text,.about-v2__interests-note{ color:var(--text-muted) }
+.about-v2__hello,.about-v2__skill-category-title{ color:var(--text-primary) }
+.about-v2__tagline,.about-v2__bio-paragraph,.about-v2__interest-label,.about-v2__stat-card{ color:var(--text-muted) }
+.about-v2__tagline{ color:color-mix(in srgb, var(--accent-secondary) 72%, var(--text-muted) 28%) }
+.about-v2__bio-lead{ color:var(--text-primary) }
+.about-v2__image-ring{ border-color:var(--accent-primary); box-shadow:0 0 40px color-mix(in srgb, var(--accent-primary) 62%, transparent), 0 0 80px color-mix(in srgb, var(--accent-secondary) 22%, transparent) }
+.about-v2__section{ border-top-color:color-mix(in srgb, var(--border-color) 82%, transparent) }
+.about-v2__stat-card,.about-v2__skill-category-card,.about-v2__interest-card{ background:color-mix(in srgb, var(--card-bg) 78%, #0a1020 22%); border-color:color-mix(in srgb, var(--border-color) 86%, var(--accent-secondary) 14%) }
+.about-v2__stat-card:hover,.about-v2__skill-category-card:hover,.about-v2__interest-card:hover{ border-color:var(--accent-secondary); box-shadow:0 16px 36px color-mix(in srgb, var(--glow-color) 60%, transparent) }
+.about-v2__stat-value,.about-v2__interest-icon{
+  /* keep titles/icons colored by accent, no background */
+  background: none !important;
+  color: var(--accent-primary);
+}
+
+/* skill fill should be visible — use theme button gradient so the progress shows */
+.about-v2__skill-fill{
+  background: linear-gradient(90deg, var(--button-gradient-start), var(--button-gradient-end));
+  box-shadow:0 0 25px color-mix(in srgb, var(--glow-color) 75%, transparent);
+}
+.about-v2__skill-track{ background:color-mix(in srgb, var(--border-color) 62%, transparent) }
+.about-v2__skill-name{ color:color-mix(in srgb, var(--text-primary) 84%, var(--text-muted) 16%) }
+

@@ -326,7 +326,7 @@ Ship in small increments, monitor regressions, and keep rollback paths simple.
 
 Scalability is the result of repeated engineering discipline, not one-time optimization.` ,
     coverImage: '/atif-ayyoub-ai-developer.png',
-    category: 'Web Dev',
+    category: 'Web Development',
     targetKeyword: 'scalable web apps',
     seoTitle: 'How to Build Scalable Web Apps | Atif Ayyoub',
     seoDescription: 'Learn how to build scalable web apps with architecture planning, performance optimization, and reliable delivery practices.',
@@ -371,6 +371,19 @@ Hiring success comes from process clarity as much as technical talent.` ,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
+]
+
+export const BLOG_CATEGORY_OPTIONS = [
+  'AI',
+  'Web Development',
+  'Business',
+  'Cybersecurity',
+  'Cloud Computing',
+  'DevOps',
+  'Mobile App Development',
+  'Data Science & Analytics',
+  'Blockchain / Web3',
+  'Software Engineering Practices',
 ]
 
 export const DEFAULT_MESSAGES = []

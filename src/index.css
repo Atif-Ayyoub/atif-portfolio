@@ -5,16 +5,144 @@
 @tailwind utilities;
 
 :root{
-  --bg: #0A0F1C;
-  --sidebar: #111827;
-  --card: #141B2D;
-  --primary: #4F46E5;
-  --secondary: #22D3EE;
-  --highlight: #8B5CF6;
-  --glow: rgba(79,70,229,0.18);
-  --text-main: #FFFFFF;
-  --text-secondary: #9CA3AF;
-  --border: #2A3447;
+  --bg-primary: #0a0f1c;
+  --bg-secondary: #111827;
+  --card-bg: #141b2d;
+  --border-color: #2a3447;
+  --accent-primary: #4f46e5;
+  --accent-secondary: #22d3ee;
+  --accent-highlight: #8b5cf6;
+  --text-primary: #ffffff;
+  --text-muted: #9ca3af;
+  --glow-color: rgba(79,70,229,0.18);
+  --button-gradient-start: #4f46e5;
+  --button-gradient-end: #22d3ee;
+
+  --bg: var(--bg-primary);
+  --sidebar: var(--bg-secondary);
+  --card: var(--card-bg);
+  --primary: var(--accent-primary);
+  --secondary: var(--accent-secondary);
+  --highlight: var(--accent-highlight);
+  --glow: var(--glow-color);
+  --text-main: var(--text-primary);
+  --text-secondary: var(--text-muted);
+  --border: var(--border-color);
+}
+
+
+
+:root[data-theme='royal-burgundy']{
+  --bg-primary: #120910;
+  --bg-secondary: #1a0f1a;
+  --card-bg: #2a1730;
+  --border-color: #5b2a4b;
+  --accent-primary: #c0267f;
+  --accent-secondary: #a855f7;
+  --accent-highlight: #e879f9;
+  --text-primary: #fff3ff;
+  --text-muted: #d6b0ce;
+  --glow-color: rgba(192,38,127,0.2);
+  --button-gradient-start: #c0267f;
+  --button-gradient-end: #a855f7;
+}
+
+
+:root[data-theme='sunlit-amber']{
+  --bg-primary: #07080a;
+  --bg-secondary: #0f0d0b;
+  --card-bg: #12100e;
+  --border-color: #3a2f1e;
+  --accent-primary: #f59e0b; /* amber */
+  --accent-secondary: #facc15; /* bright yellow */
+  --accent-highlight: #ffecb5;
+  --text-primary: #fffef8;
+  --text-muted: #d6c8a6;
+  --glow-color: rgba(245,158,11,0.18);
+  --button-gradient-start: #f59e0b;
+  --button-gradient-end: #facc15;
+}
+
+
+/* Emerald Forest (calm + premium feel) */
+:root[data-theme='emerald-forest']{
+  --bg-primary: #06110c;
+  --bg-secondary: #0b1a14;
+  --card-bg: #0f241c;
+  --border-color: #1f3d2f;
+  --accent-primary: #10b981; /* emerald */
+  --accent-secondary: #34d399; /* soft green */
+  --accent-highlight: #a7f3d0;
+  --text-primary: #ecfdf5;
+  --text-muted: #9ca3af;
+  --glow-color: rgba(16,185,129,0.18);
+  --button-gradient-start: #10b981;
+  --button-gradient-end: #34d399;
+}
+
+/* Sunset Coral (warm + eye-catching) */
+:root[data-theme='sunset-coral']{
+  --bg-primary: #0b0706;
+  --bg-secondary: #140d0a;
+  --card-bg: #1a110d;
+  --border-color: #3b2a23;
+  --accent-primary: #fb7185; /* coral pink */
+  --accent-secondary: #f97316; /* orange */
+  --accent-highlight: #ffe4e6;
+  --text-primary: #fff7f5;
+  --text-muted: #d6b3a6;
+  --glow-color: rgba(251,113,133,0.18);
+  --button-gradient-start: #fb7185;
+  --button-gradient-end: #f97316;
+}
+
+/* Royal Purple Glass (luxury + modern UI) */
+:root[data-theme='royal-purple']{
+  --bg-primary: #06060a;
+  --bg-secondary: #0d0b14;
+  --card-bg: #151221;
+  --border-color: #2a2440;
+  --accent-primary: #8b5cf6; /* purple */
+  --accent-secondary: #c084fc; /* soft violet */
+  --accent-highlight: #ede9fe;
+  --text-primary: #f5f3ff;
+  --text-muted: #b4a7d6;
+  --glow-color: rgba(139,92,246,0.18);
+  --button-gradient-start: #8b5cf6;
+  --button-gradient-end: #c084fc;
+}
+
+
+/* Amber Flare (orange combination) */
+:root[data-theme='amber-flare']{
+  --bg-primary: #0b0603;
+  --bg-secondary: #150c06;
+  --card-bg: #21130b;
+  --border-color: #5a3317;
+  --accent-primary: #f97316;
+  --accent-secondary: #fb923c;
+  --accent-highlight: #fed7aa;
+  --text-primary: #fff7ed;
+  --text-muted: #e0b792;
+  --glow-color: rgba(249,115,22,0.2);
+  --button-gradient-start: #f97316;
+  --button-gradient-end: #fb923c;
+}
+
+/* Rose Bloom (pink combination) */
+:root[data-theme='rose-bloom']{
+  --bg-primary: #0a0508;
+  --bg-secondary: #140a11;
+  --card-bg: #1d1020;
+  --border-color: #4d2a46;
+  --accent-primary: #ec4899;
+  --accent-secondary: #f472b6;
+  --accent-highlight: #fbcfe8;
+  --text-primary: #fff6fb;
+  --text-muted: #ddb1ca;
+  --glow-color: rgba(236,72,153,0.2);
+  --button-gradient-start: #ec4899;
+  --button-gradient-end: #f472b6;
 }
 
 /* Ensure all main card elements use a consistent 0.7px border with the requested color */
@@ -34,13 +162,32 @@
   border: 0.7px solid var(--border) !important;
 }
 
-*, *::before, *::after{ box-sizing:border-box; }
+*, *::before, *::after{
+  box-sizing:border-box;
+  transition: background-color .3s ease, color .3s ease, border-color .3s ease;
+}
 html,body,#root{height:100%; width:100%; max-width:100%; overflow-x:hidden;}
 body{
   margin:0;
-  background:var(--bg);
+  background:
+    radial-gradient(900px 420px at 50% -12%, color-mix(in srgb, var(--accent-primary) 18%, transparent), transparent 62%),
+    radial-gradient(700px 340px at 100% 0%, color-mix(in srgb, var(--accent-secondary) 14%, transparent), transparent 68%),
+    var(--bg);
   color:var(--text-main);
   font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+}
+
+body,
+.card-shell,
+.home-v2__btn,
+.gradient-btn,
+.social-card,
+.sidebar,
+.news-card,
+.service-card,
+.project-card,
+.admin-entity-card{
+  transition: background-color .28s ease, color .28s ease, border-color .28s ease, box-shadow .28s ease;
 }
 
 .site-scroll-progress{
@@ -366,7 +513,13 @@ html { scroll-behavior: smooth }
   width:600px;
   height:600px;
   border-radius:50%;
-  background: radial-gradient(circle, rgba(79,70,229,0.25), rgba(34,211,238,0.08) 55%, transparent 70%);
+  background:
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--accent-primary) 34%, transparent),
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 55%,
+      transparent 70%
+    );
   filter: blur(40px);
   z-index: -20;
   pointer-events: none;
@@ -457,6 +610,8 @@ html { scroll-behavior: smooth }
     flex-direction:column;
     align-items:stretch;
     backdrop-filter: blur(6px);
+    /* make mobile top bar opaque on small screens */
+    background: color-mix(in srgb, var(--card-bg) 92%, #000 8%);
   }
 
   .sidebar .profile-block{ display:none }
@@ -470,7 +625,7 @@ html { scroll-behavior: smooth }
     align-items:center;
     gap:12px;
     border-radius:12px;
-    background: rgba(255,255,255,0.02);
+    background: color-mix(in srgb, var(--card-bg) 88%, #000 12%);
     border:1px solid var(--border);
     width:100%;
   }
@@ -891,6 +1046,7 @@ html { scroll-behavior: smooth }
   flex-direction:column;
   z-index:60;
   transition:transform .25s ease;
+  overflow:auto;
 }
 
 .admin-sidebar-header{
@@ -945,6 +1101,7 @@ html { scroll-behavior: smooth }
 }
 
 .admin-sidebar-site-btn{
+  /* keep visible at the bottom of the sidebar; sticky so it remains reachable on small viewports */
   margin-top:auto;
   width:100%;
   display:inline-flex;
@@ -3075,6 +3232,7 @@ html { scroll-behavior: smooth }
   gap:18px;
   height:100%;
   padding:26px;
+  background:linear-gradient(160deg, color-mix(in srgb, var(--card-bg) 90%, #ffffff 10%), color-mix(in srgb, var(--bg-secondary) 84%, #ffffff 16%));
 }
 
 .project-card-media{
@@ -3472,10 +3630,11 @@ html { scroll-behavior: smooth }
 .footer-contact-strip{
   margin-top:80px;
   padding:32px;
-  border:1px solid rgba(255,255,255,0.1);
   border-radius:16px;
-  background:rgba(15,23,42,0.7);
-  box-shadow:0 16px 40px rgba(0,0,0,0.45);
+  border:1px solid color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%);
+  /* use theme-driven card background so the footer responds to active theme */
+  background: color-mix(in srgb, var(--card-bg) 82%, #0a1020 18%);
+  box-shadow:0 16px 40px color-mix(in srgb, rgba(0,0,0,0.45) 60%, transparent);
   text-align:center;
 }
 
@@ -3530,11 +3689,14 @@ html { scroll-behavior: smooth }
 /* ── Contact card glow hover ─────────────────────────────────── */
 .contact-card{
   transition: all .3s ease;
+  background:color-mix(in srgb, var(--card-bg) 84%, #ffffff 16%) !important;
+  border:1px solid color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%) !important;
 }
 
 .contact-card:hover{
-  border-color: #3b82f6 !important;
-  box-shadow: 0 10px 30px rgba(59,130,246,.3) !important;
+  border-color: var(--accent-secondary) !important;
+  background:color-mix(in srgb, var(--card-bg) 78%, #ffffff 22%) !important;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--glow-color) 55%, transparent) !important;
 }
 
 /* ── Send Message button ─────────────────────────────────────── */
@@ -3543,11 +3705,13 @@ html { scroll-behavior: smooth }
   border-radius: 30px !important;
   font-weight: 600;
   transition: all .3s ease !important;
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) !important;
+  color:#fff !important;
 }
 
 .send-btn:hover{
   transform: scale(1.05) !important;
-  box-shadow: 0 10px 30px rgba(59,130,246,.5) !important;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--glow-color) 75%, transparent) !important;
 }
 
 /* ── Page loader overlay ─────────────────────────────────────── */
@@ -3560,6 +3724,276 @@ html { scroll-behavior: smooth }
   align-items: center;
   justify-content: center;
 }
+
+/* Theme-aware overrides for shared public pages */
+.card-shell:hover,
+.glass-card:hover,
+.follow-card:hover,
+.social-card:hover,
+.cta-card:hover,
+.message-card:hover,
+.news-card-item:hover,
+.service-card:hover,
+.project-card:hover,
+.info-card:hover,
+.tech-stack-card:hover,
+.tech-details-card:hover,
+.center-card:hover {
+  border-color:var(--accent-secondary) !important;
+  /* remove the inner color-mix glow to reduce visual noise */
+  box-shadow:0 18px 48px rgba(0,0,0,0.55) !important;
+}
+.services-bg-blob,
+.projects-bg-blob,
+.projects-bg-orb-left,
+.projects-bg-orb-right,
+.background-circle{
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 30%, transparent), transparent 72%);
+}
+
+.projects-page{
+  background:
+    radial-gradient(1100px 560px at 8% -8%, color-mix(in srgb, var(--accent-secondary) 12%, transparent), transparent 60%),
+    radial-gradient(900px 520px at 88% 8%, color-mix(in srgb, var(--accent-primary) 12%, transparent), transparent 62%),
+    linear-gradient(180deg, var(--bg-primary) 0%, color-mix(in srgb, var(--bg-primary) 92%, #091122 8%) 55%, color-mix(in srgb, var(--bg-primary) 88%, #050816 12%) 100%);
+}
+
+.services-subtitle,
+.projects-subtitle,
+.news-description,
+.assistant-hero p,
+.assistant-footer p,
+.assistant-chat__window p,
+.blog-page__hero p,
+.blog-post-header p,
+.blog-post-content p,
+.blog-post-cta p,
+.blog-cta p{
+  color:var(--text-muted);
+}
+
+.services-title,
+.projects-title,
+.education-heading,
+.blog-page__hero h1,
+.blog-post-header h1,
+.case-title,
+.assistant-hero h1,
+.assistant-footer h3,
+.assistant-chat__header h2{
+  background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.service-hire-btn,
+.projects-cta-btn,
+.read-btn,
+.original-btn,
+.send-btn,
+.btn-contact,
+.gradient-btn,
+.assistant-send-btn,
+.project-action-primary,
+.project-filter-tab.is-active,
+.news-filter-btn.is-active,
+.blog-filter-btn.is-active,
+.case-btn-primary{
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end));
+  color:#fff;
+}
+
+.service-hire-btn:hover,
+.projects-cta-btn:hover,
+.read-btn:hover,
+.original-btn:hover,
+.send-btn:hover,
+.btn-contact:hover,
+.assistant-send-btn:hover,
+.project-action-primary:hover,
+.case-btn-primary:hover{
+  box-shadow:0 12px 30px color-mix(in srgb, var(--glow-color) 72%, transparent) !important;
+}
+
+.service-hire-btn,
+.project-filter-tab,
+.news-filter-btn,
+.blog-filter-btn,
+.project-action-secondary,
+.project-action-tertiary,
+.project-stat-card,
+.news-card-item,
+.news-modal,
+.news-filter-btn,
+.read-btn,
+.original-btn,
+.send-btn,
+.contact-card,
+.message-card input,
+.message-card textarea,
+.contact-card input,
+.contact-card textarea{
+  border-color:color-mix(in srgb, var(--border-color) 86%, transparent);
+}
+
+.service-card:hover,
+.project-card:hover,
+.news-card-item:hover,
+.assistant-quick-action:hover,
+.assistant-chip-button:hover,
+.assistant-icon-btn:hover,
+.social-card:hover,
+.follow-card:hover,
+.info-card:hover{
+  border-color:var(--accent-secondary) !important;
+}
+
+.service-price,
+.quick-value,
+.project-stat-value,
+.news-type,
+.meta-icon,
+.social-icon,
+.service-icon,
+.about-v2__stat-value,
+.about-v2__interest-icon,
+.about-v2__skill-category-title{
+  color:var(--accent-secondary);
+}
+
+.service-icon-circle,
+.progress-fill,
+.news-type,
+.meta-icon,
+.icon.gradient,
+.assistant-hero__dot,
+.assistant-chat__badge,
+.assistant-send-btn,
+.profile-circle,
+.profile-image,
+.main-circle,
+.left-circle,
+.about-v2__skill-fill,
+.education-progress-fill,
+.education-node{
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end));
+}
+
+.services-bg-blob,
+.projects-bg-blob,
+.projects-bg-orb-left,
+.projects-bg-orb-right,
+.about-v2__glow--a,
+.about-v2__glow--b,
+.assistant-page{
+  opacity:1;
+}
+
+.services-bg-blob,
+.projects-bg-blob,
+.projects-bg-orb-left,
+.projects-bg-orb-right{
+  background:radial-gradient(circle, color-mix(in srgb, var(--accent-primary) 28%, transparent), transparent 72%);
+}
+
+.projects-bg-orb-left{ background:color-mix(in srgb, var(--accent-secondary) 18%, transparent) }
+.projects-bg-orb-right{ background:color-mix(in srgb, var(--accent-primary) 20%, transparent) }
+
+.news-filter-btn:hover,
+.project-filter-tab:hover,
+.blog-filter-btn:hover,
+.service-card:hover .service-icon-circle,
+.service-card:hover .service-icon,
+.project-action-secondary:hover,
+.project-action-tertiary:hover,
+.case-btn-secondary:hover,
+.case-btn-tertiary:hover{
+  border-color:var(--accent-secondary);
+  color:var(--text-primary);
+}
+
+.news-card li,
+.service-tag,
+.tech-tag,
+.blog-card__tags span,
+.case-tech-pill,
+.assistant-chip-button,
+.assistant-quick-action,
+.assistant-status-pill,
+.assistant-stat-card,
+.assistant-chat__bubble,
+.assistant-chat__input,
+.project-stat-card,
+.project-action-secondary,
+.project-action-tertiary,
+.case-btn-secondary,
+.case-btn-tertiary,
+.blog-filter-btn,
+.blog-related-link,
+.blog-back-btn,
+.news-filter-btn,
+.read-btn,
+.original-btn,
+.send-btn,
+.btn-contact,
+.contact-card input,
+.contact-card textarea,
+.message-card input,
+.message-card textarea{
+  background:color-mix(in srgb, var(--bg-secondary) 84%, #ffffff 16%);
+  color:var(--text-primary);
+}
+
+.news-tag,
+.news-filter-btn.is-active,
+.news-filter-btn:hover,
+.read-btn,
+.original-btn,
+.news-card li:hover{
+  border-color:var(--accent-secondary);
+}
+
+.news-tag{ background:color-mix(in srgb, var(--accent-primary) 14%, transparent); }
+.read-more{ background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) !important; color:#fff !important; }
+.modal-close{ color:var(--text-primary) }
+.news-card-item,.news-modal,.project-card,.project-stat-card,.assistant-hero,.assistant-panel,.assistant-chat,.assistant-footer,.blog-page__hero,.blog-post-header,.blog-post-content,.blog-post-cta,.blog-related,.blog-cta,.about-v2__hero-wrap,.about-v2__stat-card,.about-v2__skill-category-card,.about-v2__interest-card,.education-card,.case-study-shell,.case-btn-secondary,.case-btn-tertiary,.case-tech-pill,.contact-card,.message-card input,.message-card textarea{ border-color:color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%) }
+
+.contact-card:hover,
+.send-btn:hover{
+  border-color:var(--accent-secondary) !important;
+}
+
+.contact-card input,
+.contact-card textarea,
+.message-card input,
+.message-card textarea{
+  background:color-mix(in srgb, var(--card-bg) 88%, #0a1020 12%);
+  border-color:var(--border-color);
+  color:var(--text-primary);
+}
+
+.contact-card input:focus,
+.contact-card textarea:focus,
+.message-card input:focus,
+.message-card textarea:focus{
+  outline:none;
+  border-color:var(--accent-secondary);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-secondary) 16%, transparent);
+}
+
+.send-btn,
+.btn-contact,
+.gradient-btn,
+.service-hire-btn,
+.projects-cta-btn,
+.read-btn,
+.original-btn,
+.assistant-send-btn{
+  border:none;
+}
+
 
 .loader-inner{
   display: flex;
@@ -3654,9 +4088,9 @@ html { scroll-behavior: smooth }
 }
 
 .news-filter-btn.is-active{
-  background:linear-gradient(90deg,#6366F1,#22D3EE);
-  border-color:transparent;
-  color:#fff;
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) !important;
+  border-color:transparent !important;
+  color:#fff !important;
 }
 
 .news-grid{
@@ -3733,9 +4167,10 @@ html { scroll-behavior: smooth }
 .read-btn{
   padding:10px 22px;
   border-radius:25px;
-  background:linear-gradient(90deg,#6366F1,#22D3EE);
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) !important;
   transition:.3s;
   font-size:14px;
+  color:#fff !important;
 }
 
 .read-btn:hover{

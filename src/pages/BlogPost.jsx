@@ -4,6 +4,31 @@ import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import './blog.css'
 
+function splitCategories(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function formatCategories(values) {
+  return [...new Set(values)].join(', ')
+}
+
+function parseMarkdownImage(line) {
+  const match = String(line || '').match(/^!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]+)")?\)$/)
+  if (!match) return null
+
+  const alt = match[1] || 'Blog image'
+  const src = match[2] || ''
+  const title = match[3] || ''
+  const isAllowedSrc = src.startsWith('http://') || src.startsWith('https://') || src.startsWith('/')
+
+  if (!isAllowedSrc) return null
+
+  return { alt, src, title }
+}
+
 function renderMarkdown(content) {
   const lines = String(content || '').split('\n')
   const blocks = []
@@ -46,6 +71,17 @@ function renderMarkdown(content) {
       continue
     }
 
+    if (/^-{3,}$/.test(line)) {
+      blocks.push({ type: 'hr' })
+      continue
+    }
+
+    const image = parseMarkdownImage(line)
+    if (image) {
+      blocks.push({ type: 'img', ...image })
+      continue
+    }
+
     blocks.push({ type: 'p', text: line })
   }
 
@@ -55,6 +91,15 @@ function renderMarkdown(content) {
     if (block.type === 'h1') return <h1 key={`b-${index}`}>{block.text}</h1>
     if (block.type === 'h2') return <h2 key={`b-${index}`} className={isQuestionHeading(block.text) ? 'is-question' : ''}>{block.text}</h2>
     if (block.type === 'h3') return <h3 key={`b-${index}`} className={isQuestionHeading(block.text) ? 'is-question' : ''}>{block.text}</h3>
+    if (block.type === 'hr') return <hr key={`b-${index}`} className="blog-post-divider" />
+    if (block.type === 'img') {
+      return (
+        <figure key={`b-${index}`} className="blog-md-image-wrap">
+          <img src={block.src} alt={block.alt} title={block.title || undefined} className="blog-md-image" loading="lazy" decoding="async" />
+          {block.title ? <figcaption>{block.title}</figcaption> : null}
+        </figure>
+      )
+    }
     if (block.type === 'ul') {
       return (
         <ul key={`b-${index}`}>
@@ -108,7 +153,9 @@ export default function BlogPost() {
 
   const relatedPosts = useMemo(() => {
     if (!post) return []
-    return publishedBlogs.filter((item) => item.id !== post.id).slice(0, 3)
+    const currentCategories = splitCategories(post.category)
+    const matchingPosts = publishedBlogs.filter((item) => item.id !== post.id && splitCategories(item.category).some((category) => currentCategories.includes(category)))
+    return (matchingPosts.length > 0 ? matchingPosts : publishedBlogs.filter((item) => item.id !== post.id)).slice(0, 3)
   }, [post, publishedBlogs])
 
   if (!post) return <Navigate to="/blog" replace />
@@ -160,7 +207,7 @@ export default function BlogPost() {
 
         <header className="blog-post-header card-shell">
           <p className="blog-post-meta">
-            <span>{post.category || 'General'}</span>
+            <span>{formatCategories(splitCategories(post.category)) || 'General'}</span>
             <span>{new Date(post.publishedAt || post.updatedAt || Date.now()).toLocaleDateString()}</span>
           </p>
           <h1>{post.title}</h1>
@@ -192,7 +239,7 @@ export default function BlogPost() {
             <div className="blog-related-grid">
               {relatedPosts.map((item) => (
                 <Link key={item.id} to={`/blog/${item.slug}`} className="blog-related-link">
-                  <p>{item.category || 'General'}</p>
+                  <p>{formatCategories(splitCategories(item.category)) || 'General'}</p>
                   <h3>{item.title}</h3>
                 </Link>
               ))}

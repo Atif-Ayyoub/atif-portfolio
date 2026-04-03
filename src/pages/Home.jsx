@@ -2,6 +2,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import TechStack from '../components/TechStack'
+import ThemeSwitcher from '../components/ThemeSwitcher'
 import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import { getSocialIcon } from '../admin/iconMaps'
@@ -97,6 +98,8 @@ export default function Home() {
         pathname="/"
       />
       <div className="home-v2__container">
+        <ThemeSwitcher />
+
         <section className="home-v2__hero card-shell">
           <div className="home-v2__hero-content">
             <p className="home-v2__intro">{settings.introLine || "Hi, I'm"}</p>

@@ -205,6 +205,21 @@
   outline-offset:2px;
 }
 
+
+/* Theme-aware overrides */
+.blog-page__hero,.blog-post-header,.blog-post-content,.blog-post-cta,.blog-related,.blog-cta{ background:color-mix(in srgb, var(--card-bg) 82%, #0a1020 18%); border-color:color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%) }
+.blog-page__eyebrow,.blog-quick-answer__label,.blog-breadcrumb a,.blog-read-link,.blog-cta a,.blog-post-cta a{ color:var(--accent-secondary) }
+.blog-page__hero h1,.blog-post-header h1{ color:var(--text-primary) }
+.blog-page__hero p,.blog-post-header p,.blog-post-content p,.blog-post-cta p,.blog-cta p,.blog-post-meta,.blog-card__meta,.blog-related-link p,.blog-quick-answer__text{ color:var(--text-muted) }
+.blog-filter-btn{ border-color:color-mix(in srgb, var(--border-color) 86%, transparent); background:color-mix(in srgb, var(--bg-secondary) 84%, #ffffff 16%); color:var(--text-primary) }
+.blog-filter-btn:hover,.blog-filter-btn.is-active{ border-color:var(--accent-secondary); color:var(--text-primary); background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) }
+.blog-card__tags span,.blog-related-link,.blog-back-btn{ border-color:color-mix(in srgb, var(--border-color) 86%, var(--accent-secondary) 14%); color:var(--text-primary); background:color-mix(in srgb, var(--bg-secondary) 84%, #ffffff 16%) }
+.blog-card__tags span{ color:var(--accent-secondary) }
+.blog-post-divider{ background:linear-gradient(90deg, rgba(0,0,0,0) 0%, color-mix(in srgb, var(--accent-secondary) 70%, transparent) 50%, rgba(0,0,0,0) 100%) }
+.blog-md-image{ border-color:color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%) }
+.blog-md-image-wrap figcaption{ color:var(--text-muted) }
+.blog-back-btn:hover,.blog-related-link:hover,.blog-read-link:hover,.blog-cta a:hover,.blog-post-cta a:hover{ color:var(--accent-secondary) }
+
 .blog-post-meta{
   display:flex;
   gap:12px;
@@ -321,6 +336,30 @@
   margin:10px 0 14px 20px;
   color:#d7e3f3;
   line-height:1.7;
+}
+
+.blog-post-divider{
+  border:none;
+  height:1px;
+  margin:24px 0;
+  background:linear-gradient(90deg, rgba(34,211,238,0) 0%, rgba(34,211,238,0.65) 50%, rgba(34,211,238,0) 100%);
+}
+
+.blog-md-image-wrap{
+  margin:18px 0;
+}
+
+.blog-md-image{
+  width:100%;
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,0.22);
+  display:block;
+}
+
+.blog-md-image-wrap figcaption{
+  margin-top:8px;
+  color:#9fb3cc;
+  font-size:13px;
 }
 
 .blog-related-grid{

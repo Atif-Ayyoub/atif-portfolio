@@ -20,7 +20,8 @@ const items = [
 export default function Sidebar({ active, onNavigate }){
   const [collapsed, setCollapsed] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [isMobileNavVisible, setIsMobileNavVisible] = useState(true)
+  // mobileNavState: 0 = full (profile + icons), 1 = icons only, 2 = hidden
+  const [mobileNavState, setMobileNavState] = useState(0)
   const { settings, sortedSocialLinks } = usePortfolioData()
   const profileSocials = sortedSocialLinks
     .filter((link) => link.isActive)
@@ -35,7 +36,7 @@ export default function Sidebar({ active, onNavigate }){
 
   useEffect(() => {
     if (!isMobile) {
-      setIsMobileNavVisible(true)
+      setMobileNavState(0)
     }
   }, [isMobile])
 
@@ -43,17 +44,17 @@ export default function Sidebar({ active, onNavigate }){
     <>
       {isMobile && (
         <button
-          aria-label={isMobileNavVisible ? 'Hide navigation bar' : 'Show navigation bar'}
-          aria-expanded={isMobileNavVisible}
-          className="collapse-btn mobile-nav-toggle"
-          onClick={() => setIsMobileNavVisible((s) => !s)}
-        >
-          {isMobileNavVisible ? <FaTimes /> : <FaBars />}
-        </button>
+            aria-label={mobileNavState === 2 ? 'Show navigation bar' : mobileNavState === 1 ? 'Hide icons' : 'Hide navigation bar'}
+            aria-expanded={mobileNavState !== 2}
+            className="collapse-btn mobile-nav-toggle"
+            onClick={() => setMobileNavState(s => (s + 1) % 3)}
+          >
+            {mobileNavState === 2 ? <FaBars /> : <FaTimes />}
+          </button>
       )}
 
-      <aside className={`sidebar bg-sidebar p-6 border-r ${collapsed ? 'collapsed' : ''} ${isMobile && !isMobileNavVisible ? 'mobile-hidden' : ''}`}>
-        {isMobile && (
+      <aside className={`sidebar bg-sidebar p-6 border-r ${collapsed ? 'collapsed' : ''} ${isMobile && mobileNavState === 2 ? 'mobile-hidden' : ''}`}>
+        {isMobile && mobileNavState === 0 && (
           <div className="mobile-header-card" role="banner">
             <img src={settings.profileImage || '/atif-ayyoub-profile.png'} alt="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" loading="lazy" decoding="async" className="mobile-profile-image" />
             <div className="mobile-header-text">
@@ -78,7 +79,7 @@ export default function Sidebar({ active, onNavigate }){
           {!collapsed && !isMobile && (
             <>
               <h2 className="mt-4 text-2xl font-extrabold">{settings.fullName}</h2>
-              <p className="text-sm text-[#22D3EE] mt-1">{settings.professionalTitle}</p>
+              <p className="text-sm mt-1" style={{ color: 'var(--secondary)' }}>{settings.professionalTitle}</p>
               <div className="sidebar-social-row" aria-label="Profile social links">
                 {profileSocials.map((link) => {
                   const Icon = getSocialIcon(link.icon)
@@ -109,7 +110,7 @@ export default function Sidebar({ active, onNavigate }){
               const Icon = it.icon
               const isActive = active === it.id
               return (
-                <li key={it.id} className={`nav-item ${isActive ? 'active' : ''}`} onClick={() => onNavigate(it.id)}>
+                <li key={it.id} className={`nav-item ${isActive ? 'active' : ''}`} onClick={() => onNavigate(it.id)} style={{ display: isMobile && mobileNavState === 2 ? 'none' : undefined }}>
                   <div className="flex items-center justify-center">
                     <Icon className="text-lg" />
                     {!isMobile && !collapsed && <span>{'\u00A0\u00A0'}{it.label}</span>}

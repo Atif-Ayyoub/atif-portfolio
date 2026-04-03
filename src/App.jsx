@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Cursor from './components/Cursor'
 import DeferredAnimatedBg from './components/DeferredAnimatedBg'
@@ -36,6 +36,15 @@ export default function App(){
   const navigate = useNavigate()
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('portfolio_theme_v1')
+    if (storedTheme) {
+      document.documentElement.dataset.theme = storedTheme
+    } else {
+      delete document.documentElement.dataset.theme
+    }
+  }, [])
 
   const activePublicNav = (() => {
     if (location.pathname === '/') return 'home'

@@ -56,6 +56,26 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
+function reorderBlogsByDisplayOrder(list, targetId, desiredOrder, now) {
+  const others = [...list]
+    .filter((item) => item.id !== targetId)
+    .sort((a, b) => Number(a.displayOrder) - Number(b.displayOrder))
+
+  const insertIndex = Math.max(0, Math.min(Number(desiredOrder) - 1, others.length))
+  const reordered = [...others]
+  reordered.splice(insertIndex, 0, list.find((item) => item.id === targetId))
+
+  return reordered.map((item, index) => {
+    const nextOrder = index + 1
+    if (Number(item.displayOrder) === nextOrder) return item
+    return {
+      ...item,
+      displayOrder: nextOrder,
+      updatedAt: now,
+    }
+  })
+}
+
 function shouldUseLocalBlogFallback(error) {
   const code = String(error?.code || '')
   const message = String(error?.message || '').toLowerCase()
@@ -757,15 +777,22 @@ export function PortfolioDataProvider({ children }) {
             .filter(Boolean),
       isPublished: Boolean(blog.isPublished),
       featured: Boolean(blog.featured),
-      displayOrder: toNumber(blog.displayOrder, 0),
+      displayOrder: Math.max(1, toNumber(blog.displayOrder, 1)),
       publishedAt: blog.publishedAt || now,
       createdAt: id ? blog.createdAt || now : now,
       updatedAt: now,
     }
 
+    const existingBlogs = blogsRef.current
+    const mergedBlogs = id
+      ? existingBlogs.map((item) => (item.id === id ? { ...item, ...cleaned } : item))
+      : [...existingBlogs, cleaned]
+    const reorderedBlogs = reorderBlogsByDisplayOrder(mergedBlogs, cleaned.id, cleaned.displayOrder, now)
+    const savedBlog = reorderedBlogs.find((item) => item.id === cleaned.id) || cleaned
+
     if (hasSupabase) {
-      const dbPayload = mapAppBlogToDb(cleaned)
-      console.log('Attempting to save blog to Supabase:', dbPayload)
+      const dbPayload = reorderedBlogs.map(mapAppBlogToDb)
+      console.log('Attempting to save reordered blogs to Supabase:', dbPayload)
       const { error } = await supabase
         .from('blog_posts')
         .upsert(dbPayload, { onConflict: 'id' })
@@ -780,15 +807,10 @@ export function PortfolioDataProvider({ children }) {
       }
     }
 
-    setBlogs((prev) => {
-      const next = id
-        ? prev.map((item) => (item.id === id ? { ...item, ...cleaned } : item))
-        : [...prev, cleaned]
-      persist(STORAGE_KEYS.blogs, next)
-      return next
-    })
+    setBlogs(reorderedBlogs)
+    persist(STORAGE_KEYS.blogs, reorderedBlogs)
 
-    return cleaned
+    return savedBlog
   }
 
   const deleteBlog = async (id) => {

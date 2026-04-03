@@ -4,9 +4,9 @@
   padding: 32px 24px 96px;
   font-family: 'Inter', 'Satoshi', 'Geist', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background:
-    radial-gradient(1200px 560px at 12% -10%, rgba(56, 189, 248, 0.12), transparent 62%),
-    radial-gradient(900px 420px at 88% -6%, rgba(99, 102, 241, 0.14), transparent 60%),
-    #050914;
+    radial-gradient(1200px 560px at 12% -10%, color-mix(in srgb, var(--accent-secondary) 12%, transparent), transparent 62%),
+    radial-gradient(900px 420px at 88% -6%, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 60%),
+    var(--bg-primary);
 }
 
 .case-study-wrap {
@@ -259,3 +259,21 @@
     font-size: 1.4rem;
   }
 }
+
+/* Theme-aware overrides */
+.case-study-shell{
+  background:
+    radial-gradient(1200px 560px at 12% -10%, color-mix(in srgb, var(--accent-secondary) 12%, transparent), transparent 62%),
+    radial-gradient(900px 420px at 88% -6%, color-mix(in srgb, var(--accent-primary) 14%, transparent), transparent 60%),
+    var(--bg-primary);
+}
+.case-kicker{ color:color-mix(in srgb, var(--accent-secondary) 72%, var(--text-muted) 28%) }
+.case-title{ color:var(--text-primary) }
+.case-lead,.case-block p,.case-meta-label,.case-meta-value{ color:var(--text-muted) }
+.case-btn-primary{ background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)); box-shadow:0 8px 30px color-mix(in srgb, var(--glow-color) 72%, transparent) }
+.case-btn-secondary,.case-btn-tertiary{ background:color-mix(in srgb, var(--bg-secondary) 82%, #ffffff 18%); border-color:color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%); color:var(--text-primary) }
+.case-btn-secondary:hover,.case-btn-tertiary:hover,.case-back-link:hover{ border-color:var(--accent-secondary); color:var(--accent-secondary) }
+.case-meta-item,.case-preview-image{ border-color:color-mix(in srgb, var(--border-color) 86%, var(--accent-secondary) 14%) }
+.case-tech-pill{ background:color-mix(in srgb, var(--bg-secondary) 82%, #ffffff 18%); color:var(--accent-secondary) }
+.case-preview-image{ box-shadow:0 22px 65px rgba(0,0,0,0.42), 0 0 20px color-mix(in srgb, var(--glow-color) 45%, transparent) }
+

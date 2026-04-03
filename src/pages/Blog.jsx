@@ -1,21 +1,30 @@
 import React, { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
+import { BLOG_CATEGORY_OPTIONS } from '../admin/seedData'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import './blog.css'
+
+function splitCategories(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function formatCategories(values) {
+  return [...new Set(values)].join(', ')
+}
 
 export default function Blog() {
   const { publishedBlogs } = usePortfolioData()
   const [activeCategory, setActiveCategory] = useState('All')
 
-  const categories = useMemo(() => {
-    const values = [...new Set(publishedBlogs.map((post) => post.category).filter(Boolean))]
-    return ['All', ...values]
-  }, [publishedBlogs])
+  const categories = useMemo(() => ['All', ...BLOG_CATEGORY_OPTIONS], [])
 
   const filteredPosts = useMemo(() => {
     if (activeCategory === 'All') return publishedBlogs
-    return publishedBlogs.filter((post) => post.category === activeCategory)
+    return publishedBlogs.filter((post) => splitCategories(post.category).includes(activeCategory))
   }, [activeCategory, publishedBlogs])
 
   return (
@@ -71,7 +80,7 @@ export default function Blog() {
               </div>
               <div className="blog-card__content">
                 <p className="blog-card__meta">
-                  <span>{post.category || 'General'}</span>
+                  <span>{formatCategories(splitCategories(post.category)) || 'General'}</span>
                   <span>{new Date(post.publishedAt || post.updatedAt || Date.now()).toLocaleDateString()}</span>
                 </p>
                 <h2>{post.title}</h2>
