@@ -119,63 +119,6 @@ export const DEFAULT_SERVICES = [
   },
 ]
 
-// Additional mobile projects
-DEFAULT_PROJECTS.push(
-  {
-    id: 'project-zx-player',
-    title: 'ZX Player',
-    shortDescription: 'ZX Player — a sleek Flutter-powered media player for smooth playback and intuitive controls.',
-    fullDescription:
-      'ZX Player is a sleek Flutter-powered media player built with Dart, delivering smooth playback, intuitive controls, and a refined user experience for seamless video streaming and management.',
-    thumbnail: '/zx-player.png',
-    galleryImages: [],
-    technologies: ['Flutter', 'Dart'],
-    category: 'Mobile Apps',
-    liveUrl: '',
-    githubUrl: '',
-    caseStudyUrl: '',
-    projectStatus: 'completed',
-    featured: false,
-    displayOrder: 4,
-    isActive: true,
-    startDate: '',
-    endDate: '',
-    clientName: '',
-    role: 'Mobile Developer',
-    highlights: 'High-performance playback, clean controls, optimized buffering.',
-    challengesSolutions: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-
-  {
-    id: 'project-dr-assistant',
-    title: 'Dr Assistant',
-    shortDescription: 'Dr Assistant — a Flutter healthcare assistant for appointments and medical records management.',
-    fullDescription:
-      'Dr Assistant is a sleek Flutter-powered healthcare assistant built with Dart, enabling users to manage appointments, track medical records, and stay organized with an intuitive and user-friendly interface.',
-    thumbnail: '/dr-assistant.png',
-    galleryImages: [],
-    technologies: ['Flutter', 'Dart'],
-    category: 'Mobile Apps',
-    liveUrl: '',
-    githubUrl: '',
-    caseStudyUrl: '',
-    projectStatus: 'completed',
-    featured: false,
-    displayOrder: 5,
-    isActive: true,
-    startDate: '',
-    endDate: '',
-    clientName: '',
-    role: 'Mobile Developer',
-    highlights: 'Appointment management, record tracking, polished UX.',
-    challengesSolutions: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  }
-)
-
 export const DEFAULT_PROJECTS = [
   {
     id: 'project-wallpaper-hub',

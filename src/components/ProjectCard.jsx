@@ -13,64 +13,93 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
-export default function ProjectCard({ project, large = false, className = '' }){
+function normalizeTags(tags) {
+  if (!Array.isArray(tags)) return []
+  return tags.map((tag) => String(tag || '').trim()).filter(Boolean)
+}
+
+export default function ProjectCard({ project }) {
   const caseStudySlug = slugify(project.title)
+  const tags = normalizeTags(project.tags).slice(0, 5)
 
   return (
     <motion.article
-      whileHover={{ y: -4 }}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
-      className={`project-card ${className}`}
+      className="pcard"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.18 }}
+      transition={{ duration: 0.42 }}
+      whileHover={{ y: -6 }}
     >
-      <div className="project-card-inner">
+      <div className="pcard__media">
+        {project.image ? (
+          <img
+            src={project.image}
+            alt={`${project.title} preview`}
+            className="pcard__image"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div className="pcard__placeholder">Preview coming soon</div>
+        )}
 
-        <div className="project-card-media">
-          <div className="project-card-media-overlay" />
-          <div className="project-card-media-content">
-            {project.image
-              ? <img src={project.image} alt={`${project.title} AI web development project for ${project.category || 'modern apps'}`} loading="lazy" decoding="async" className="project-card-image object-contain object-center w-full h-full" />
-              : <div className="text-sm">Project Screenshot Placeholder</div>}
-          </div>
-        </div>
-
-        <div className="project-card-copy">
-          <h3
-            className={`project-card-title ${large ? 'text-2xl' : 'text-lg'}`}
-            style={['Student Evaluation System', 'Wallpaper Hub'].includes(project.title) ? { marginTop: '10px' } : undefined}
-          >
-            {project.title}
-          </h3>
-          <p className="project-desc">{project.description}</p>
-        </div>
-
-        <div className="project-tags-row">
-          {project.tags?.slice(0,5).map(t => (
-            <span key={t} className="tech-tag">{t}</span>
-          ))}
-        </div>
-
-        <div className="project-buttons">
-          <Link to={`/projects/${caseStudySlug}`} className="project-action project-action-primary inline-flex items-center gap-2 text-sm">
+        <div className="pcard__overlay">
+          <Link to={`/projects/${caseStudySlug}`} className="pcard__overlayCta">
             View Case Study
           </Link>
-          {project.liveUrl ? (
-            <a href={project.liveUrl} target="_blank" rel="noreferrer" className="project-action project-action-secondary text-sm inline-flex items-center gap-1">
-              Live Demo <ArrowUpRight size={15} />
-            </a>
-          ) : (
-            <button className="project-action project-action-secondary text-sm" disabled>Live Demo</button>
-          )}
-          {project.repo ? (
-            <a className="project-action project-action-tertiary inline-flex items-center gap-2 text-sm" href={project.repo} target="_blank" rel="noreferrer">
-              <Github size={15} /> Code
-            </a>
-          ) : (
-            <button className="project-action project-action-tertiary text-sm" disabled>Code</button>
-          )}
-        </div>
 
+          <div className="pcard__overlayLinks">
+            {project.liveUrl ? (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" aria-label="Open live demo">
+                <ArrowUpRight size={14} />
+              </a>
+            ) : null}
+
+            {project.repo ? (
+              <a href={project.repo} target="_blank" rel="noreferrer" aria-label="Open code repository">
+                <Github size={14} />
+              </a>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div className="pcard__content">
+        <h3 className="pcard__title">{project.title}</h3>
+        <p className="pcard__desc">{project.description}</p>
+
+        {tags.length > 0 ? (
+          <div className="pcard__tags" aria-label="Technologies">
+            {tags.map((tag) => (
+              <span key={tag} className="pcard__tag">{tag}</span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="pcard__actions">
+          <Link to={`/projects/${caseStudySlug}`} className="pcard__btn pcard__btn--primary">
+            View Case Study
+          </Link>
+
+          <div className="pcard__actionsRow">
+            {project.liveUrl ? (
+              <a href={project.liveUrl} target="_blank" rel="noreferrer" className="pcard__btn pcard__btn--secondary">
+                Live Demo <ArrowUpRight size={14} />
+              </a>
+            ) : (
+              <button className="pcard__btn pcard__btn--secondary" disabled>Live Demo</button>
+            )}
+
+            {project.repo ? (
+              <a href={project.repo} target="_blank" rel="noreferrer" className="pcard__btn pcard__btn--tertiary">
+                <Github size={14} /> Code
+              </a>
+            ) : (
+              <button className="pcard__btn pcard__btn--tertiary" disabled>Code</button>
+            )}
+          </div>
+        </div>
       </div>
     </motion.article>
   )

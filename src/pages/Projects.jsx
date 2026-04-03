@@ -1,150 +1,175 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import ProjectShowcase from '../components/ProjectShowcase'
 import ProjectCard from '../components/ProjectCard'
 import Seo from '../components/Seo'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 import './project.css'
 
-export default function Projects(){
+function normalizeCategory(value) {
+  if (Array.isArray(value)) return value.map((entry) => String(entry).trim()).filter(Boolean)
+  return String(value || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+}
+
+function categorizeProject(category) {
+  const values = normalizeCategory(category).map((item) => item.toLowerCase())
+  return values.some((item) => item.includes('mobile')) ? 'Mobile Apps' : 'Web Apps'
+}
+
+function easeOutCubic(value) {
+  return 1 - Math.pow(1 - value, 3)
+}
+
+function CountUpStat({ label, target }) {
+  const cardRef = useRef(null)
+  const hasAnimatedRef = useRef(false)
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    const element = cardRef.current
+    if (!element) return undefined
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || hasAnimatedRef.current) return
+        hasAnimatedRef.current = true
+
+        const duration = 1800
+        const startTime = performance.now()
+
+        const tick = (now) => {
+          const progress = Math.min((now - startTime) / duration, 1)
+          const eased = easeOutCubic(progress)
+          setCount(Math.round(eased * target))
+          if (progress < 1) requestAnimationFrame(tick)
+        }
+
+        requestAnimationFrame(tick)
+      },
+      { threshold: 0.35 },
+    )
+
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [target])
+
+  return (
+    <article ref={cardRef} className="ppage__statCard">
+      <p className="ppage__statValue">{count}+</p>
+      <p className="ppage__statLabel">{label}</p>
+    </article>
+  )
+}
+
+export default function Projects() {
   const navigate = useNavigate()
   const { sortedProjects } = usePortfolioData()
+  const [activeFilter, setActiveFilter] = useState('All')
 
-  const normalizeCategory = (value) => {
-    if (Array.isArray(value)) return value.map((entry) => String(entry).trim()).filter(Boolean)
-    return String(value || '')
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean)
-  }
-
-  const publicProjects = useMemo(() => {
+  const projects = useMemo(() => {
     return sortedProjects
-      .filter((project) => project.isActive)
-      .map((project) => ({
-        id: project.id,
-        title: project.title,
-        category: project.category,
-        image: project.thumbnail,
-        repo: project.githubUrl,
-        liveUrl: project.liveUrl,
-        description: project.shortDescription,
-        tags: project.technologies,
-        categoryList: normalizeCategory(project.category),
+      .filter((item) => item.isActive)
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        category: item.category,
+        categoryList: normalizeCategory(item.category),
+        image: item.thumbnail,
+        description: item.shortDescription,
+        tags: item.technologies,
+        liveUrl: item.liveUrl,
+        repo: item.githubUrl,
+        filterGroup: categorizeProject(item.category),
       }))
   }, [sortedProjects])
 
-  const filters = useMemo(() => {
-    const allCategories = publicProjects.flatMap((project) => project.categoryList)
-    const uniqueCategories = Array.from(new Set(allCategories))
-    return ['All', ...uniqueCategories]
-  }, [publicProjects])
+  const filters = ['All', 'Web Apps', 'Mobile Apps']
 
-  const [active, setActive] = useState('All')
+  const filteredProjects = useMemo(() => {
+    if (activeFilter === 'All') return projects
+    return projects.filter((project) => project.filterGroup === activeFilter)
+  }, [activeFilter, projects])
 
-  const filtered = useMemo(() => {
-    if (active === 'All') return publicProjects
-    return publicProjects.filter((project) => project.categoryList.includes(active))
-  }, [active, publicProjects])
-
-  const featured = filtered[0] || publicProjects[0]
-  const spotlight = filtered.filter((project) => project.id !== featured?.id).slice(0, 3)
-  const gridProjects = filtered.filter((project) => project.id !== featured?.id)
-
-  const projectStats = [
-    { value: `${publicProjects.length}+`, label: 'Published Projects' },
-    { value: `${filters.length - 1}+`, label: 'Project Domains' },
-    { value: '100%', label: 'Mobile Responsive' },
-  ]
+  const stats = useMemo(() => {
+    const totalProjects = projects.length
+    const webApps = projects.filter((project) => project.filterGroup === 'Web Apps').length
+    const mobileApps = projects.filter((project) => project.filterGroup === 'Mobile Apps').length
+    return [
+      { label: 'Projects Delivered', target: totalProjects },
+      { label: 'Web Apps', target: webApps },
+      { label: 'Mobile Apps', target: mobileApps },
+    ]
+  }, [projects])
 
   return (
-    <section className="projects-page">
+    <section className="ppage">
       <Seo
-        title="Web, AI & Software Projects | Atif Ayyoub"
-        description="Browse web, AI, and software projects by Atif Ayyoub including scalable web apps, dashboards, and API-driven products."
+        title="Projects | Premium Product Showcase"
+        description="Modern case-study style portfolio projects with polished interactions, responsive card layouts, and production-grade product design."
         pathname="/projects"
       />
-      <div className="projects-bg-blob" aria-hidden="true" />
-      <div className="projects-bg-orb projects-bg-orb-left" aria-hidden="true" />
-      <div className="projects-bg-orb projects-bg-orb-right" aria-hidden="true" />
-      <div className="projects-noise" aria-hidden="true" />
 
-      <div className="projects-shell section-container">
-        <header className="projects-header">
-          <div className="projects-eyebrow">Case Studies</div>
-          <h1 className="projects-title">Professional Project Portfolio</h1>
-          <p className="projects-subtitle">
-            End-to-end product builds across AI tooling, web apps, dashboards, and API platforms.
-            Each project is structured with clear outcomes, technical depth, and production-ready UX.
+      <div className="ppage__ambient ppage__ambient--left" aria-hidden="true" />
+      <div className="ppage__ambient ppage__ambient--right" aria-hidden="true" />
+
+      <div className="ppage__container section-container">
+        <header className="ppage__hero">
+          <p className="ppage__kicker">Projects</p>
+          <h1 className="ppage__title">Premium Product Showcase</h1>
+          <p className="ppage__subtitle">
+            A focused collection of production-ready builds across web and mobile experiences,
+            designed with strong UX hierarchy, maintainable architecture, and measurable impact.
           </p>
-          <div className="projects-filters" role="tablist" aria-label="Project categories">
-            {filters.map(f => (
+
+          <div className="ppage__filtersWrap" role="tablist" aria-label="Project category filters">
+            {filters.map((filter) => (
               <button
-                key={f}
+                key={filter}
                 type="button"
-                onClick={()=>setActive(f)}
                 role="tab"
-                aria-selected={active === f}
-                className={`project-filter-tab ${active===f ? 'is-active' : ''}`}
+                aria-selected={activeFilter === filter}
+                className={`ppage__filter ${activeFilter === filter ? 'is-active' : ''}`}
+                onClick={() => setActiveFilter(filter)}
               >
-                {f}
+                {filter}
               </button>
             ))}
           </div>
         </header>
 
-        <main className="projects-main">
-          <ProjectShowcase
-            featured={featured}
-            spotlight={spotlight}
-            onExploreServices={() => navigate('/services')}
-          />
+        <section className="ppage__cards" aria-label="Project cards">
+          <div className="ppage__grid">
+            {filteredProjects.length === 0 ? <p className="ppage__empty">No projects found for this filter.</p> : null}
 
-          <section className="projects-grid-wrap" aria-label="All projects">
-            <div className="projects-cards-grid">
-              {gridProjects.length === 0 ? <p className="projects-empty">No additional projects available for this category yet.</p> : null}
-              {gridProjects.map((project, index) => (
-                <motion.div
-                  key={project.id}
-                  className="project-card-motion"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.15 }}
-                  transition={{ duration: 0.45, delay: Math.min(index * 0.08, 0.3) }}
-                >
-                  <ProjectCard project={project} />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-
-          <div className="project-stats-grid">
-            {projectStats.map((item, index) => (
-              <motion.article
-                key={item.label}
-                className="project-stat-card"
-                initial={{ opacity: 0, y: 20 }}
+            {filteredProjects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.45, delay: index * 0.1 }}
+                viewport={{ once: true, amount: 0.12 }}
+                transition={{ duration: 0.42, delay: Math.min(index * 0.07, 0.28) }}
+                className="ppage__gridItem"
               >
-                <p className="project-stat-value">{item.value}</p>
-                <p className="project-stat-label">{item.label}</p>
-              </motion.article>
+                <ProjectCard project={project} />
+              </motion.div>
             ))}
           </div>
+        </section>
 
-          <div className="projects-cta-wrap">
-            <button
-              type="button"
-              className="projects-cta-btn"
-              onClick={() => navigate('/services')}
-            >
-              Need a Similar Product? Let&apos;s Build It
-            </button>
-          </div>
-        </main>
+        <section className="ppage__stats" aria-label="Project statistics">
+          {stats.map((item) => (
+            <CountUpStat key={item.label} label={item.label} target={item.target} />
+          ))}
+        </section>
+
+        <div className="ppage__ctaWrap">
+          <button type="button" className="ppage__cta" onClick={() => navigate('/services')}>
+            Need a Similar Product? Explore Services
+          </button>
+        </div>
       </div>
     </section>
   )
