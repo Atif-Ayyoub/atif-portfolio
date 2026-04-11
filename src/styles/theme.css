@@ -1,0 +1,141 @@
+:root{
+  --bg-primary: #0a0f1c;
+  --bg-secondary: #111827;
+  --card-bg: #141b2d;
+  --border-color: #2a3447;
+  --accent-primary: #4f46e5;
+  --accent-secondary: #22d3ee;
+  --accent-highlight: #8b5cf6;
+  --text-primary: #ffffff;
+  --text-muted: #9ca3af;
+  --glow-color: rgba(79,70,229,0.18);
+  --button-gradient-start: #4f46e5;
+  --button-gradient-end: #22d3ee;
+
+  --bg: var(--bg-primary);
+  --sidebar: var(--bg-secondary);
+  --card: var(--card-bg);
+  --primary: var(--accent-primary);
+  --secondary: var(--accent-secondary);
+  --highlight: var(--accent-highlight);
+  --glow: var(--glow-color);
+  --text-main: var(--text-primary);
+  --text-secondary: var(--text-muted);
+  --border: var(--border-color);
+}
+
+
+
+:root[data-theme='royal-burgundy']{
+  --bg-primary: #120910;
+  --bg-secondary: #1a0f1a;
+  --card-bg: #2a1730;
+  --border-color: #5b2a4b;
+  --accent-primary: #c0267f;
+  --accent-secondary: #a855f7;
+  --accent-highlight: #e879f9;
+  --text-primary: #fff3ff;
+  --text-muted: #d6b0ce;
+  --glow-color: rgba(192,38,127,0.2);
+  --button-gradient-start: #c0267f;
+  --button-gradient-end: #a855f7;
+}
+
+
+:root[data-theme='sunlit-amber']{
+  --bg-primary: #07080a;
+  --bg-secondary: #0f0d0b;
+  --card-bg: #12100e;
+  --border-color: #3a2f1e;
+  --accent-primary: #f59e0b; /* amber */
+  --accent-secondary: #facc15; /* bright yellow */
+  --accent-highlight: #ffecb5;
+  --text-primary: #fffef8;
+  --text-muted: #d6c8a6;
+  --glow-color: rgba(245,158,11,0.18);
+  --button-gradient-start: #f59e0b;
+  --button-gradient-end: #facc15;
+}
+
+
+/* Emerald Forest (calm + premium feel) */
+:root[data-theme='emerald-forest']{
+  --bg-primary: #06110c;
+  --bg-secondary: #0b1a14;
+  --card-bg: #0f241c;
+  --border-color: #1f3d2f;
+  --accent-primary: #10b981; /* emerald */
+  --accent-secondary: #34d399; /* soft green */
+  --accent-highlight: #a7f3d0;
+  --text-primary: #ecfdf5;
+  --text-muted: #9ca3af;
+  --glow-color: rgba(16,185,129,0.18);
+  --button-gradient-start: #10b981;
+  --button-gradient-end: #34d399;
+}
+
+/* Sunset Coral (warm + eye-catching) */
+:root[data-theme='sunset-coral']{
+  --bg-primary: #0b0706;
+  --bg-secondary: #140d0a;
+  --card-bg: #1a110d;
+  --border-color: #3b2a23;
+  --accent-primary: #fb7185; /* coral pink */
+  --accent-secondary: #f97316; /* orange */
+  --accent-highlight: #ffe4e6;
+  --text-primary: #fff7f5;
+  --text-muted: #d6b3a6;
+  --glow-color: rgba(251,113,133,0.18);
+  --button-gradient-start: #fb7185;
+  --button-gradient-end: #f97316;
+}
+
+/* Royal Purple Glass (luxury + modern UI) */
+:root[data-theme='royal-purple']{
+  --bg-primary: #06060a;
+  --bg-secondary: #0d0b14;
+  --card-bg: #151221;
+  --border-color: #2a2440;
+  --accent-primary: #8b5cf6; /* purple */
+  --accent-secondary: #c084fc; /* soft violet */
+  --accent-highlight: #ede9fe;
+  --text-primary: #f5f3ff;
+  --text-muted: #b4a7d6;
+  --glow-color: rgba(139,92,246,0.18);
+  --button-gradient-start: #8b5cf6;
+  --button-gradient-end: #c084fc;
+}
+
+
+/* Amber Flare (orange combination) */
+:root[data-theme='amber-flare']{
+  --bg-primary: #0b0603;
+  --bg-secondary: #150c06;
+  --card-bg: #21130b;
+  --border-color: #5a3317;
+  --accent-primary: #f97316;
+  --accent-secondary: #fb923c;
+  --accent-highlight: #fed7aa;
+  --text-primary: #fff7ed;
+  --text-muted: #e0b792;
+  --glow-color: rgba(249,115,22,0.2);
+  --button-gradient-start: #f97316;
+  --button-gradient-end: #fb923c;
+}
+
+/* Rose Bloom (pink combination) */
+:root[data-theme='rose-bloom']{
+  --bg-primary: #0a0508;
+  --bg-secondary: #140a11;
+  --card-bg: #1d1020;
+  --border-color: #4d2a46;
+  --accent-primary: #ec4899;
+  --accent-secondary: #f472b6;
+  --accent-highlight: #fbcfe8;
+  --text-primary: #fff6fb;
+  --text-muted: #ddb1ca;
+  --glow-color: rgba(236,72,153,0.2);
+  --button-gradient-start: #ec4899;
+  --button-gradient-end: #f472b6;
+}
+

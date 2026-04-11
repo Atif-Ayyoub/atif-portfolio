@@ -1,0 +1,68 @@
+/* Contact page specific styles */
+.contact-hero{ width:60%; margin:0 auto 20px; text-align:center }
+@media (max-width: 767px){ .contact-hero{ width:100% } }
+
+.contact-grid{ width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:24px; margin-top:20px }
+@media (max-width: 767px){ .contact-grid{ grid-template-columns: 1fr } }
+
+.follow-card{ margin-top:30px; background:var(--card); padding:25px; border-radius:14px; border:1px solid var(--border) }
+.follow-title{ color:white; font-size:22px; margin-bottom:20px }
+.social-container{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px }
+.social-card{ background:var(--border); padding:14px; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:0.3s; text-decoration:none }
+.social-card:hover{ transform:translateY(-5px); background:#374151; box-shadow:0 10px 25px rgba(0,0,0,0.5) }
+.social-icon{ font-size:26px; margin-bottom:8px; color:var(--secondary) }
+.social-icon img{ width:26px; height:26px; object-fit:contain; display:block }
+.social-card span{ color:#E5E7EB; font-size:14px }
+
+.contact-grid > *{ display:flex; flex-direction:column; align-self:start }
+.contact-grid .follow-card{ display:flex; flex-direction:column }
+
+.message-card{ min-height:420px; padding:22px }
+.message-card form{ display:flex; flex-direction:column; flex:1 }
+.message-card label{ font-size:13px; margin-bottom:6px }
+.message-card input,
+.message-card textarea{ width:100%; background:#141B2D; border:1px solid var(--border); padding:14px; border-radius:10px; color:white; margin-bottom:12px; font-size:14px }
+.message-card textarea{ min-height:140px; resize:vertical }
+.message-card .text-right{ margin-top:auto }
+
+.contact-card{
+  transition: all .3s ease;
+  background:color-mix(in srgb, var(--card-bg) 84%, #ffffff 16%) !important;
+  border:1px solid color-mix(in srgb, var(--border-color) 88%, var(--accent-secondary) 12%) !important;
+}
+.contact-card:hover{
+  border-color: var(--accent-secondary) !important;
+  background:color-mix(in srgb, var(--card-bg) 78%, #ffffff 22%) !important;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--glow-color) 55%, transparent) !important;
+}
+
+.contact-card input,
+.contact-card textarea,
+.message-card input,
+.message-card textarea{
+  background:color-mix(in srgb, var(--card-bg) 88%, #0a1020 12%);
+  border-color:var(--border-color);
+  color:var(--text-primary);
+}
+
+.contact-card input:focus,
+.contact-card textarea:focus,
+.message-card input:focus,
+.message-card textarea:focus{
+  outline:none;
+  border-color:var(--accent-secondary);
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-secondary) 16%, transparent);
+}
+
+.send-btn{
+  padding: 14px 32px !important;
+  border-radius: 30px !important;
+  font-weight: 600;
+  transition: all .3s ease !important;
+  background:linear-gradient(135deg,var(--button-gradient-start),var(--button-gradient-end)) !important;
+  color:#fff !important;
+}
+.send-btn:hover{
+  transform: scale(1.05) !important;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--glow-color) 75%, transparent) !important;
+}

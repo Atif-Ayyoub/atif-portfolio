@@ -1,0 +1,415 @@
+/* Floating circle animation */
+@keyframes floatCircle {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Sidebar profile wrapper animation */
+.profile-circle{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  overflow:hidden;
+  border:3px solid var(--primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: floatCircle 3s ease-in-out infinite;
+  box-shadow:0 0 25px rgba(79,70,229,0.25);
+}
+
+/* Unified card hover: change border to neon blue and add subtle glow */
+.glass-card:hover,
+.follow-card:hover,
+.social-card:hover,
+.cta-card:hover,
+.message-card:hover,
+.news-card:hover,
+.news-card-item:hover,
+.service-card:hover,
+.info-card:hover,
+.tech-stack-card:hover,
+.tech-details-card:hover,
+.center-card:hover {
+  border-color: #22D3EE !important;
+  box-shadow: 0 12px 36px rgba(34,211,238,0.10), 0 0 18px rgba(34,211,238,0.06);
+}
+
+/* Catch-all: any element with a class containing "card" gets neon border on hover */
+[class*="card"]:hover{
+  border-color: #22D3EE !important;
+  box-shadow: 0 12px 36px rgba(34,211,238,0.10), 0 0 18px rgba(34,211,238,0.06);
+}
+
+/* Floating decorative circle inside main content */
+.main-circle{
+  position:absolute;
+  right:120px;
+  top:120px;
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  border:3px solid var(--primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation: floatCircle 3s ease-in-out infinite;
+  box-shadow:0 0 25px rgba(79,70,229,0.45);
+  pointer-events:none;
+  z-index:0;
+}
+
+.main-circle .inner-circle{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  border:2px solid var(--secondary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+}
+
+/* Background decorative circle */
+.background-circle{
+  position:absolute;
+  top:-220px;
+  left:-220px;
+  width:600px;
+  height:600px;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      color-mix(in srgb, var(--accent-primary) 34%, transparent),
+      color-mix(in srgb, var(--accent-secondary) 18%, transparent) 55%,
+      transparent 70%
+    );
+  filter: blur(40px);
+  z-index: -20;
+  pointer-events: none;
+}
+
+/* Layout helpers */
+.sidebar{ width:280px; height:100vh; position:fixed; left:0; top:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.main-content{ margin-left:280px; width:calc(100% - 280px); max-width:100%; position:relative; z-index:2; padding:40px }
+.hero{ min-height:100vh; display:flex; flex-direction:column; justify-content:center }
+
+/* Two-column hero: left circle + right text */
+.hero-row{ display:flex; align-items:center; gap:70px; justify-content:flex-start }
+.hero-left{ display:flex; align-items:flex-start; justify-content:flex-start; flex-shrink:0 }
+.hero-right{ display:flex; flex-direction:column; text-align:left }
+
+.left-circle{
+  width:220px;
+  height:220px;
+  border-radius:50%;
+  background: url('/atif-ayyoub-ai-developer.png') center/cover no-repeat, linear-gradient(135deg, rgba(79,70,229,0.12), rgba(34,211,238,0.06));
+  border:3px solid var(--primary);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 18px 60px rgba(34,211,238,0.03), 0 8px 30px rgba(79,70,229,0.08);
+  animation: floatCircle 3.2s ease-in-out infinite;
+  background-size:cover;
+}
+
+@media (max-width: 767px){
+  .hero-row{ flex-direction:column; text-align:center }
+  .hero-left{ margin-bottom:12px; align-items:center; justify-content:center }
+  .hero-right{ text-align:center }
+}
+
+/* Mobile/tablet layout: make sidebar a top bar */
+@media (max-width: 1199px){
+  .sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    width:100%;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 12px;
+    border-right:0;
+    border-bottom:1px solid var(--border);
+    z-index:40;
+  }
+
+  .sidebar .profile-block{ display:flex; flex-direction:row; align-items:center; gap:12px; margin-top:0 }
+  .sidebar .profile-block > div{ margin-bottom:0 }
+  .profile-circle{ width:56px; height:56px; border-width:2px; }
+  .profile-image{ width:56px; height:56px; border-width:2px }
+  .sidebar .profile-circle{ margin-top:10px }
+
+  .sidebar .profile-block > h2,
+  .sidebar .profile-block > p{ display:none }
+
+  /* show only icons on mobile top bar */
+
+  /* Disable collapsed sidebar effects at tablet breakpoint since sidebar becomes fullwidth top bar */
+  .sidebar.collapsed ~ .main-content{
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+}
+
+/* Mobile-only (narrow) header card and horizontal icons */
+@media (max-width: 767px){
+  .sidebar{
+    /* keep top bar fixed so it remains visible while content scrolls */
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    width:100%;
+    height:auto;
+    padding:8px 6px;
+    border-right:0;
+    border-bottom:0;
+    z-index:60;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    backdrop-filter: blur(6px);
+    /* make mobile top bar opaque on small screens */
+    background: color-mix(in srgb, var(--card-bg) 92%, #000 8%);
+  }
+
+  .sidebar .profile-block{ display:none }
+
+  .mobile-header-card{
+    margin-top:8px;
+    margin-left:0;
+    margin-right:0;
+    padding:8px 12px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-radius:12px;
+    background: color-mix(in srgb, var(--card-bg) 88%, #000 12%);
+    border:1px solid var(--border);
+    width:100%;
+  }
+
+  .mobile-profile-image{ width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--primary) }
+
+  .mobile-header-text h2{ margin:0; font-size:16px; font-weight:700 }
+  .mobile-header-text p{ margin:0; font-size:12px; color:var(--muted, #9ca3af) }
+
+  /* present nav icons horizontally below the header card; allow scrolling */
+  .nav-menu{ display:flex; flex-direction:row; gap:4px; justify-content:flex-start; margin-top:8px; padding:4px 8px; width:100%; overflow-x:auto; white-space:nowrap; -webkit-overflow-scrolling:touch }
+  /* hide visible scrollbars but keep scroll functionality */
+  .nav-menu{ -ms-overflow-style: none; /* IE/Edge */
+               scrollbar-width: none; /* Firefox */ }
+  .nav-menu::-webkit-scrollbar{ display: none; height: 0; }
+  .nav-item{ display:inline-flex; align-items:center; justify-content:center; padding:0; margin:0 4px }
+  .collapse-btn{ display:none }
+  .nav-menu{ margin-left:auto; margin-top:0; display:flex !important; flex-direction:row !important; gap:4px; align-items:center; flex-wrap:nowrap }
+  .nav-item{ width:44px; height:44px; padding:0; border-radius:6px; background:transparent; display:inline-flex !important; align-items:center; justify-content:center; box-sizing:border-box }
+  .nav-item:hover{ transform:none }
+  .nav-item span{ display:none }
+
+  /* Active item: visible filled background; others remain transparent */
+ .nav-item.active{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white; font-weight:600; box-shadow:0 8px 18px rgba(79,70,229,0.12) }
+  .nav-item:not(.active){ background: transparent }
+
+  /* Increase icon size on mobile while preserving 44px touch targets */
+  .nav-item svg{ width:20px; height:20px; font-size:22px; display:block }
+
+  /* Add extra top spacing so page content starts 30px below the fixed top bar */
+  .main-content{ margin-left:0; width:100%; padding:224px 12px 24px }
+
+  .mobile-nav-toggle{
+    display:inline-flex;
+    position:fixed;
+    top:14px;
+    right:12px;
+    z-index:80;
+  }
+
+  .sidebar.mobile-hidden{
+    transform: translateY(calc(-100% - 16px));
+    opacity:0;
+    pointer-events:none;
+  }
+
+  .sidebar.mobile-hidden ~ .main-content{
+    padding-top:92px;
+  }
+}
+
+/* Profile image helper */
+.profile-image{ width:120px; height:120px; border-radius:50%; border:3px solid var(--primary); box-shadow:0 0 20px var(--primary); display:block }
+
+/* Ensure profile img fills circle */
+.profile-circle .profile-image{ width:100%; height:100%; object-fit:cover; border-radius:50% }
+
+/* Collapsed sidebar styles */
+.sidebar.collapsed{ width:88px }
+.sidebar.collapsed ~ .main-content{ 
+  margin-left:88px;
+  width:calc(100% - 88px);
+}
+.sidebar.collapsed .profile-circle{ width:84px; height:84px; border-width:2px }
+.sidebar.collapsed .profile-image{ width:84px; height:84px; border-width:2px }
+.sidebar.collapsed .profile-block > h2,
+.sidebar.collapsed .profile-block > p{ display:none }
+.sidebar.collapsed .nav-menu{ align-items:center; margin-left:0 }
+.sidebar.collapsed .nav-item{ padding:10px; display:flex; justify-content:center }
+.sidebar.collapsed .nav-item span{ display:none }
+.collapse-btn{ width:44px; height:44px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.06); background:transparent; color:rgba(229,231,235,0.9); cursor:pointer; padding:0; font-size:18px }
+.collapse-btn:focus{ outline:none }
+
+/* Hover and transform for the icon; rotated to vertical when hovered in collapsed state */
+.collapse-btn svg{ transition: transform .18s ease, color .18s ease }
+.collapse-btn:hover{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color: #fff; box-shadow:0 8px 24px rgba(79,70,229,0.18) }
+.collapse-btn:hover svg{ transform: rotate(90deg) }
+
+/* smooth transitions for layout changes */
+.sidebar, .main-content, .profile-circle, .profile-image, .collapse-btn{ transition: all .22s ease }
+.main-content{ transition: margin-left .22s ease, width .22s ease }
+
+/* Details cards on Home */
+
+/* Tech Stack 3D card */
+.tech-stack-card{ max-width:880px; margin:0 auto; background:var(--card); padding:18px; border-radius:14px; border:1px solid var(--border); box-shadow:0 12px 30px rgba(0,0,0,0.5) }
+.tech-label{ color:#E6EEF8; font-size:13px; padding:6px 10px; border-radius:10px; background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03); display:inline-block; white-space:nowrap }
+
+/* Glassmorphism for tech card */
+.tech-stack-card{ background: rgba(255,255,255,0.04); backdrop-filter: blur(14px); border:1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 60px rgba(0,0,0,0.55); border-radius:20px; padding:20px }
+
+/* background gradient lights */
+.tech-bg-lights{ position: absolute; inset: 0; pointer-events:none; z-index:0 }
+.tech-bg-light{ position:absolute; width:520px; height:520px; border-radius:999px; filter: blur(120px); opacity:0.45 }
+.tech-bg-light.light-left{ left:-150px; top:-120px; background: radial-gradient(circle, rgba(0,245,255,0.18), transparent 40%) }
+.tech-bg-light.light-right{ right:-140px; bottom:-60px; background: radial-gradient(circle, rgba(138,43,226,0.14), transparent 40%) }
+
+/* tech logo overlay */
+.tech-logo{ width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:999px; background:rgba(255,255,255,0.02); box-shadow:0 8px 40px rgba(0,0,0,0.6); color:white; font-size:20px }
+.tech-logo svg{ width:40px; height:40px }
+.tech-logo img{ width:40px; height:40px }
+.tech-icon{ filter: drop-shadow(0 0 10px rgba(59,130,246,0.35)); }
+
+/* title and footer inside card */
+.tech-footer{ margin-top:12px; display:flex; align-items:center; gap:18px; justify-content:space-between }
+.tech-title{ font-size:20px; font-weight:800 }
+
+/* tooltip */
+.tech-tooltip{ background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04); padding:10px 14px; border-radius:10px }
+.tech-tooltip-title{ font-weight:700; font-size:14px }
+.tech-tooltip-desc{ color:rgba(255,255,255,0.7); font-size:13px; margin-top:6px }
+
+/* hover glow for HTML overlays (when interacting) */
+.tech-logo:hover{ transform: scale(1.08); box-shadow: 0 12px 40px rgba(0,0,0,0.6) }
+
+/* center identity */
+.tech-stack-card .tech-title{ font-size:20px; font-weight:800 }
+.tech-stack-card .tech-center{ display:flex; align-items:center; justify-content:center; gap:12px }
+.tech-center-badge{ padding:12px 20px; border-radius:14px; background:linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.06); box-shadow:0 18px 48px rgba(139,92,246,0.06); font-weight:800; font-size:15px }
+
+/* icon glow when hovering a sphere */
+.tech-logo:hover{ transform: scale(1.06); filter: drop-shadow(0 0 18px rgba(59,130,246,0.28)); }
+
+/* depth: slightly blur back elements on smaller z by CSS fallback for HTML overlays */
+.tech-stack-card canvas{ display:block; border-radius:16px }
+
+/* gradient title utility already exists as .gradient-text */
+
+
+.details-container{ display:grid; grid-template-columns:1fr; gap:30px; margin-top:40px; align-items:stretch; width:100% }
+.info-card{ background:var(--card); padding:25px; border-radius:15px; border:0.7px solid #2A3447; display:flex; flex-direction:column; justify-content:space-between; width:100% }
+
+/* On medium+ screens show two cards side-by-side */
+@media (min-width: 768px) {
+  .details-container { grid-template-columns: 60% 40% }
+}
+
+/* (removed global override of .grid-cols-2 so Tailwind classes behave normally) */
+.row{ display:grid; grid-template-columns:40% 60%; align-items:center; padding:12px 0px; border-bottom:0.7px solid #2A3447 }
+.row:last-child{ border-bottom:none }
+.row > .label,
+.row > .value{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  text-align:left;
+  padding:20px;
+}
+.label{ color:var(--secondary); font-weight:600; font-size:14px }
+.value{ color:#E5E7EB; font-size:14px }
+
+.icon{ display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; background:var(--border); margin-right:16px; font-size:20px }
+.icon.gradient{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:white }
+.info-card:hover{ transform:translateY(-6px); box-shadow:0 15px 40px rgba(0,0,0,0.6); transition:0.3s }
+
+/* Global icon spacing: give icons a 10px bottom margin for visual separation */
+.nav-item svg,
+.social-icon,
+.service-icon,
+.icon{ margin-bottom:10px }
+
+/* Vertical divider between label and value */
+/* remove extra right padding on label; spacing handled by cell padding */
+.row > .label { padding-right: 0 }
+
+/* Single vertical divider for the whole card */
+.info-card{ position:relative }
+.info-card::before{
+  content: '';
+  position: absolute;
+  top: 25px; /* match card padding */
+  bottom: 25px;
+  left: calc(25px + 40% + -10px); /* shifted 7px left from previous position */
+  width: 0.7px;
+  background: #2A3447;
+  pointer-events: none;
+}
+
+/* Remove the vertical divider on small screens */
+@media (max-width: 767px) {
+  .info-card::before{ display:none }
+  .row > .label { padding-right: 0 }
+}
+
+/* Hide vertical divider for service cards which use centered layout */
+.info-card.service-card::before{ display: none }
+
+/* Sidebar nav styling (desktop-first) */
+.nav-menu{ margin-left:10px; margin-top:20px; display:flex; flex-direction:column; gap:10px; list-style:none; padding:0 }
+
+/* Each nav item follows: [icon][label] with consistent spacing */
+.nav-item{
+  list-style:none;
+}
+.nav-item > .nav-item-inner{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  min-height:48px;
+  border-radius:12px;
+  cursor:pointer;
+  color:var(--text-secondary);
+  background:var(--border);
+  transition:all .24s ease;
+  font-size:15px;
+}
+.nav-item > .nav-item-inner .nav-icon{
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 24px;
+  margin-left:32px;
+}
+.nav-item > .nav-item-inner .nav-icon svg{ width:20px; height:20px; display:block }
+.nav-item > .nav-item-inner .nav-label{ font-size:15px; text-align:left; color:var(--text-main) }
+.nav-item > .nav-item-inner:hover{ transform:translateX(4px); box-shadow:0 10px 30px rgba(2,6,23,0.08) }
+.nav-item.active > .nav-item-inner{ background: linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; font-weight:600; box-shadow:0 12px 32px color-mix(in srgb, var(--glow-color) 60%, transparent) }
+

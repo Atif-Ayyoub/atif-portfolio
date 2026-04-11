@@ -1,39 +1,39 @@
 import React, { Suspense, useEffect, useState } from 'react'
-import Sidebar from './components/Sidebar'
-import Cursor from './components/Cursor'
-import DeferredAnimatedBg from './components/DeferredAnimatedBg'
-import Footer from './components/Footer'
-import Loader from './components/Loader'
-import ReviewPopup from './components/ReviewPopup'
-import ScrollEnhancements from './components/ScrollEnhancements'
+import Sidebar from './user/components/Sidebar'
+import Cursor from './user/components/Cursor'
+import DeferredAnimatedBg from './user/components/DeferredAnimatedBg'
+import Footer from './user/components/Footer'
+import Loader from './user/components/Loader'
+import ReviewPopup from './user/components/ReviewPopup'
+import ScrollEnhancements from './user/components/ScrollEnhancements'
 import { Navigate, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import ProtectedRoute from './admin/ProtectedRoute'
 import useReviewPrompt from './hooks/useReviewPrompt'
 
-const Home = React.lazy(() => import('./pages/Home'))
-const About = React.lazy(() => import('./pages/About'))
-const Services = React.lazy(() => import('./pages/Services'))
-const Education = React.lazy(() => import('./pages/Education'))
-const Projects = React.lazy(() => import('./pages/Projects'))
-const ProjectCaseStudy = React.lazy(() => import('./pages/ProjectCaseStudy'))
-const ProgrammaticSeoPage = React.lazy(() => import('./pages/ProgrammaticSeoPage'))
-const Assistant = React.lazy(() => import('./pages/Assistant'))
-const Blog = React.lazy(() => import('./pages/Blog'))
-const BlogPost = React.lazy(() => import('./pages/BlogPost'))
-const News = React.lazy(() => import('./pages/News'))
-const Contact = React.lazy(() => import('./pages/Contact'))
-const NotFound = React.lazy(() => import('./pages/NotFound'))
+const Home = React.lazy(() => import('./user/pages/userpages/Home'))
+const About = React.lazy(() => import('./user/pages/userpages/About'))
+const Services = React.lazy(() => import('./user/pages/userpages/Services'))
+const Education = React.lazy(() => import('./user/pages/userpages/Education'))
+const Projects = React.lazy(() => import('./user/pages/userpages/Projects'))
+const ProjectCaseStudy = React.lazy(() => import('./user/pages/userpages/ProjectCaseStudy'))
+const ProgrammaticSeoPage = React.lazy(() => import('./user/pages/userpages/ProgrammaticSeoPage'))
+const Assistant = React.lazy(() => import('./user/pages/userpages/Assistant'))
+const Blog = React.lazy(() => import('./user/pages/userpages/Blog'))
+const BlogPost = React.lazy(() => import('./user/pages/userpages/BlogPost'))
+const News = React.lazy(() => import('./user/pages/userpages/News'))
+const Contact = React.lazy(() => import('./user/pages/userpages/Contact'))
+const NotFound = React.lazy(() => import('./user/pages/userpages/NotFound'))
 
-const AdminLoginPage = React.lazy(() => import('./pages/admin/AdminLoginPage'))
-const AdminDashboardPage = React.lazy(() => import('./pages/admin/AdminDashboardPage'))
-const AdminServicesPage = React.lazy(() => import('./pages/admin/AdminServicesPage'))
-const AdminProjectsPage = React.lazy(() => import('./pages/admin/AdminProjectsPage'))
-const AdminEducationPage = React.lazy(() => import('./pages/admin/AdminEducationPage'))
-const AdminBlogPage = React.lazy(() => import('./pages/admin/AdminBlogPage'))
-const AdminMessagesPage = React.lazy(() => import('./pages/admin/AdminMessagesPage'))
-const AdminReviewsPage = React.lazy(() => import('./pages/admin/AdminReviewsPage'))
-const AdminSettingsPage = React.lazy(() => import('./pages/admin/AdminSettingsPage'))
-const AdminSocialLinksPage = React.lazy(() => import('./pages/admin/AdminSocialLinksPage'))
+const AdminLoginPage = React.lazy(() => import('./admin/pages/AdminLoginPage'))
+const AdminDashboardPage = React.lazy(() => import('./admin/pages/AdminDashboardPage'))
+const AdminServicesPage = React.lazy(() => import('./admin/pages/AdminServicesPage'))
+const AdminProjectsPage = React.lazy(() => import('./admin/pages/AdminProjectsPage'))
+const AdminEducationPage = React.lazy(() => import('./admin/pages/AdminEducationPage'))
+const AdminBlogPage = React.lazy(() => import('./admin/pages/AdminBlogPage'))
+const AdminMessagesPage = React.lazy(() => import('./admin/pages/AdminMessagesPage'))
+const AdminReviewsPage = React.lazy(() => import('./admin/pages/AdminReviewsPage'))
+const AdminSettingsPage = React.lazy(() => import('./admin/pages/AdminSettingsPage'))
+const AdminSocialLinksPage = React.lazy(() => import('./admin/pages/AdminSocialLinksPage'))
 
 export default function App(){
   const navigate = useNavigate()
@@ -234,4 +234,5 @@ export default function App(){
     </>
   )
 }
+
 
