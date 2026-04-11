@@ -1,13 +1,33 @@
 import React, { useState, useEffect } from 'react'
-import { FaHome, FaUser, FaServicestack, FaEnvelope, FaTimes, FaBars, FaBlog, FaNewspaper, FaUserShield, FaRobot, FaGraduationCap } from 'react-icons/fa'
+import { FaHome, FaUser, FaEnvelope, FaTimes, FaBars, FaBlog, FaNewspaper, FaUserShield, FaRobot, FaGraduationCap } from 'react-icons/fa'
 import { FolderKanban } from 'lucide-react'
 import { getSocialIcon } from '../admin/iconMaps'
 import { usePortfolioData } from '../context/PortfolioDataContext'
 
+function ServicesOutlineIcon(props) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <rect x="4" y="7" width="16" height="12" rx="3" />
+      <path d="M9 7V5.8C9 4.8 9.8 4 10.8 4H13.2C14.2 4 15 4.8 15 5.8V7" />
+      <path d="M4 12.2H20" />
+      <path d="M11 14.2H13" />
+    </svg>
+  )
+}
+
 const items = [
   { id: 'home', label: 'Home', icon: FaHome },
   { id: 'about', label: 'About', icon: FaUser },
-  { id: 'services', label: 'Services', icon: FaServicestack },
+  { id: 'services', label: 'Services', icon: ServicesOutlineIcon },
   { id: 'education', label: 'Education', icon: FaGraduationCap },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'assistant', label: 'AI Assistant', icon: FaRobot },
@@ -111,9 +131,9 @@ export default function Sidebar({ active, onNavigate }){
               const isActive = active === it.id
               return (
                 <li key={it.id} className={`nav-item ${isActive ? 'active' : ''}`} onClick={() => onNavigate(it.id)} style={{ display: isMobile && mobileNavState === 2 ? 'none' : undefined }}>
-                  <div className="flex items-center justify-center">
-                    <Icon className="text-lg" />
-                    {!isMobile && !collapsed && <span>{'\u00A0\u00A0'}{it.label}</span>}
+                  <div className="nav-item-inner">
+                    <span className="nav-icon" aria-hidden="true"><Icon /></span>
+                    {!isMobile && !collapsed && <span className="nav-label">{it.label}</span>}
                   </div>
                 </li>
               )
