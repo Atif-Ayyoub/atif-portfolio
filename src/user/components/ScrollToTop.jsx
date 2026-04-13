@@ -2,7 +2,45 @@ import { useEffect, useLayoutEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 
 export default function ScrollToTop() {
-  const { pathname, key } = useLocation()
+  const { pathname, search, key } = useLocation()
+
+  const scrollElementToTop = (node) => {
+    if (!node) return
+
+    if (node === window) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      return
+    }
+
+    node.scrollTop = 0
+    node.scrollTo?.({ top: 0, left: 0, behavior: 'auto' })
+  }
+
+  const getScrollTargets = () => {
+    const targets = [
+      window,
+      document.scrollingElement,
+      document.documentElement,
+      document.body,
+      document.getElementById('root'),
+      document.querySelector('.main-content'),
+      document.querySelector('.admin-main'),
+    ]
+
+    return [...new Set(targets.filter(Boolean))]
+  }
+
+  const scrollAllToTop = () => {
+    if (typeof window === 'undefined') return
+
+    const docEl = document.documentElement
+    const prevScrollBehavior = docEl.style.scrollBehavior
+    docEl.style.scrollBehavior = 'auto'
+
+    getScrollTargets().forEach(scrollElementToTop)
+
+    docEl.style.scrollBehavior = prevScrollBehavior
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
@@ -16,30 +54,23 @@ export default function ScrollToTop() {
   }, [])
 
   useLayoutEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return undefined
 
-    const docEl = document.documentElement
-    const prevScrollBehavior = docEl.style.scrollBehavior
-    docEl.style.scrollBehavior = 'auto'
+    scrollAllToTop()
 
-    window.scrollTo(0, 0)
-    document.body.scrollTop = 0
-    docEl.scrollTop = 0
+    // Re-run after route lazy chunks/layout settle so late mounts cannot retain prior scroll.
+    const frameId = window.requestAnimationFrame(scrollAllToTop)
+    const timeoutA = window.setTimeout(scrollAllToTop, 80)
+    const timeoutB = window.setTimeout(scrollAllToTop, 220)
+    const timeoutC = window.setTimeout(scrollAllToTop, 420)
 
-    const mainContent = document.querySelector('.main-content')
-    if (mainContent) {
-      mainContent.scrollTop = 0
-      mainContent.scrollTo?.({ top: 0, left: 0, behavior: 'auto' })
+    return () => {
+      window.cancelAnimationFrame(frameId)
+      window.clearTimeout(timeoutA)
+      window.clearTimeout(timeoutB)
+      window.clearTimeout(timeoutC)
     }
-
-    const adminMain = document.querySelector('.admin-main')
-    if (adminMain) {
-      adminMain.scrollTop = 0
-      adminMain.scrollTo?.({ top: 0, left: 0, behavior: 'auto' })
-    }
-
-    docEl.style.scrollBehavior = prevScrollBehavior
-  }, [pathname, key])
+  }, [pathname, search, key])
 
   return null
 }

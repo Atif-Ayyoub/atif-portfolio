@@ -76,7 +76,7 @@ export default function Sidebar({ active, onNavigate }){
       <aside className={`sidebar bg-sidebar p-6 border-r ${collapsed ? 'collapsed' : ''} ${isMobile && mobileNavState === 2 ? 'mobile-hidden' : ''}`}>
         {isMobile && mobileNavState === 0 && (
           <div className="mobile-header-card" role="banner">
-            <img src={settings.logoImage || settings.profileImage || '/atif_logo_hd.png'} alt="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" loading="lazy" decoding="async" className="mobile-profile-image" />
+            <img src={settings.logoImage || settings.profileImage || '/Atif logo.png'} alt="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" loading="lazy" decoding="async" className="mobile-profile-image" />
             <div className="mobile-header-text">
               <h2>{settings.fullName || 'Atif Ayyoub'}</h2>
               <p>{settings.professionalTitle || 'AI Web & Custom Software Developer'}</p>
@@ -94,7 +94,7 @@ export default function Sidebar({ active, onNavigate }){
 
         <div className="flex flex-col items-center text-center profile-block">
           <div className="profile-circle rounded-full">
-            <img src={settings.logoImage || settings.profileImage || '/atif_logo_hd.png'} alt="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" loading="eager" decoding="async" className="profile-image" />
+            <img src={settings.logoImage || settings.profileImage || '/Atif logo.png'} alt="Hi, I'm Atif Ayyoub, an AI Web & Custom Software Developer" loading="eager" decoding="async" className="profile-image" />
           </div>
           {!collapsed && !isMobile && (
             <>
