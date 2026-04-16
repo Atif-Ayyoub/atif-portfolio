@@ -250,7 +250,6 @@ export default function News(){
         title="AI, Web & Software News | Atif Ayyoub"
         description="Latest AI, web development, and software news curated for developers and tech-focused businesses."
         pathname="/news"
-        noindex
       />
       <div className="contact-hero">
         <h1 className="services-title">AI, Web &amp; Software News</h1>

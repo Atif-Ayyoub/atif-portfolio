@@ -22,6 +22,11 @@
   </url>
 
   <url>
+    <loc>https://atif-portfolio-nine.vercel.app/news</loc>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://atif-portfolio-nine.vercel.app/services</loc>
     <priority>0.8</priority>
   </url>
