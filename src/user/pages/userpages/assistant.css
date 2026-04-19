@@ -592,14 +592,16 @@
   .assistant-hero__actions,
   .assistant-chat__composer-actions{
     justify-content:flex-start;
-    flex-wrap:wrap;
+    /* keep composer actions on a single row in mobile */
+    flex-wrap:nowrap;
   }
 
   .assistant-chip-button,
   .assistant-provider-select--mini,
   .assistant-icon-btn,
   .assistant-send-btn{
-    width:100%;
+    width:auto;
+    flex:0 0 auto;
   }
 
   .assistant-provider-select--mini{
