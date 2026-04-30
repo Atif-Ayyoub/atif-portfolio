@@ -208,7 +208,7 @@ export default function Assistant() {
     () => ({
       id: 'welcome',
       role: 'assistant',
-      text: `Hello. I’m ${snapshot.name}'s portfolio assistant. Ask about projects, services, skills, blog topics, or any general question.`,
+      text: `Hello. I’m Nexa. I'm ${snapshot.name}'s portfolio assistant. Ask me about ${snapshot.name}'s projects, services, skills, blog topics, or any general question.`,
       provider: null,
       createdAt: new Date().toISOString(),
     }),
